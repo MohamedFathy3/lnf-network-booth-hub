@@ -1,21 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   ArrowRight,
   Beer,
   Check,
   Coffee,
+  CupSoda,
   Expand,
   Eye,
+  Gift,
   Globe2,
   Handshake,
-  Menu,
+  Heart,
+  Hourglass,
+  MapPin,
   MonitorUp,
   QrCode,
   Star,
   Users,
   Utensils,
-  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,11 +26,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import boothHero from "@/assets/booth-hero-clean.jpg.asset.json";
 import premiumCounter from "@/assets/premium-counter.jpg.asset.json";
 import sharedTable from "@/assets/shared-table.jpg.asset.json";
 import wallFame from "@/assets/wall-fame.jpg.asset.json";
-import beerImage from "@/assets/beer.jpg.asset.json";
 import pretzelImage from "@/assets/pretzel.jpg.asset.json";
 import coffeeImage from "@/assets/coffee.jpg.asset.json";
 import eveningImage from "@/assets/evening.jpg.asset.json";
@@ -38,7 +39,8 @@ export const Route = createFileRoute("/")({
       { title: "LNF Shared Booth — transport logistic 2027 Munich" },
       {
         name: "description",
-        content: "Join seven logistics networks at the LNF Shared Booth at transport logistic 2027 in Munich.",
+        content:
+          "Join seven logistics networks at the LNF Shared Booth at transport logistic 2027 in Munich.",
       },
       { property: "og:title", content: "LNF Shared Booth — transport logistic 2027" },
       {
@@ -46,13 +48,19 @@ export const Route = createFileRoute("/")({
         content: "Seven networks. One booth. Countless connections in Munich, 26–29 April 2027.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/Logo%20(3).png" },
+      { property: "og:image:alt", content: "LNF Logistics Network Federation logo" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/Logo%20(3).png" },
+      { name: "twitter:image:alt", content: "LNF Logistics Network Federation logo" },
     ],
   }),
   component: Index,
 });
 
 type PackageKey = "premium" | "twoThirds" | "oneThird" | "wall";
+const eventDateText = "26–29 April 2027 · Messe München";
+const transportTitleText = "transport logistic 2027";
 
 const packageOptions: Record<PackageKey, { label: string; price: number }> = {
   premium: { label: "Category 1 · Premium Counter", price: 4250 },
@@ -61,14 +69,39 @@ const packageOptions: Record<PackageKey, { label: string; price: number }> = {
   wall: { label: "Wall of Fame", price: 950 },
 };
 
-const networks = [
-  ["U", "UCONNECT"],
-  ["24", "24plus"],
-  ["WR", "WorldRing"],
-  ["AFBN", "African Freight Bridge Network"],
-  ["WSA", "World Shipping Alliance"],
-  ["CPN", "Cargo Power Network"],
-  ["JGC", "JGC Line"],
+const networkLogos = [
+  {
+    src: "/logos/2-dc7caaa3-ffbd-40fe-ace8-c21f5b5f315c.png",
+    alt: "U Line",
+  },
+  {
+    src: "/logos/3-997bf5e9-c766-4b4e-9950-9f488b0ccc07.png",
+    alt: "Cargo Power Network",
+  },
+  {
+    src: "/logos/4-8a8d8c1c-f93a-400e-bd80-d25cbeae01ca.png",
+    alt: "UCONNECT",
+  },
+  {
+    src: "/logos/7-7e000de3-3e3a-4cbd-89ff-58f47f453b78.png",
+    alt: "World Shipping Alliance Elite",
+  },
+  {
+    src: "/logos/logo-aic-46c3832e-b9c7-403e-95f0-1d31dd81b472.png",
+    alt: "AirCargoGroup",
+  },
+  {
+    src: "/logos/logo-bling-2026-dd67515c-40ac-4e06-bac2-f3bf2c8b42ca.png",
+    alt: "Bling Network",
+  },
+  {
+    src: "/logos/whatsapp-image-2026-06-11-at-121609-pm-5559bbf1-3e84-48be-bd66-9242d0996534.jpeg",
+    alt: "African Freight Bridge Network",
+  },
+  {
+    src: "/logos/worldring-logo-new-smarter-by-connecting-black-black-980ad6c6-6633-4bab-87ba-1c645b1b4752.png",
+    alt: "WorldRing",
+  },
 ];
 
 const featureItems = [
@@ -85,7 +118,7 @@ const packages = [
     category: "Category 1",
     title: "Premium Counter",
     price: "4,250 EUR",
-    image: premiumCounter.url,
+    image: "/sposlnf/55.png",
     top: true,
     bullets: [
       "Branded counter",
@@ -103,7 +136,7 @@ const packages = [
     category: "Category 2",
     title: "Shared High Table 2/3",
     price: "3,500 EUR",
-    image: sharedTable.url,
+    image: "/sposlnf/Bavarian.jpg",
     bullets: [
       "2/3 branded shared high table",
       "4 fixed seats",
@@ -118,7 +151,7 @@ const packages = [
     category: "Category 3",
     title: "Shared High Table 1/3",
     price: "3,000 EUR",
-    image: sharedTable.url,
+   image: "/sposlnf/Bavarian.jpg",
     bullets: [
       "1/3 branded shared high table",
       "2 fixed seats",
@@ -133,7 +166,7 @@ const packages = [
     category: "",
     title: "Wall of Fame",
     price: "950 EUR",
-    image: wallFame.url,
+    image: "/sposlnf/WhatsApp Image 2026-09-21 at 1.58.17 PM.jpeg",
     bullets: [
       "Logo, contact photo and QR code",
       "Presence even without attending in person",
@@ -147,39 +180,73 @@ const sponsors = [
   {
     title: "Beer Sponsor",
     price: "2,000 EUR",
-    image: beerImage.url,
+    image: "sposlnf/Beer.jpg",
     icon: Beer,
-    bullets: ["Logo on the beer cups", "Strong visibility in the networking environment", "Sympathetic presence with high recall value"],
+    bulletIcons: [CupSoda, Users, Heart],
+    bullets: [
+      "Logo on the beer cups",
+      "Strong visibility in the\nnetworking environment",
+      "Sympathetic presence with\nhigh recall value",
+    ],
   },
   {
     title: "Pretzel Sponsor",
     price: "1,500 EUR",
-    image: pretzelImage.url,
+    image: "/sposlnf/Pretzel.jpg",
     icon: Utensils,
-    bullets: ["Logo on the pretzel stand", "Culinary attention magnet", "Presence at a central meeting point"],
+    bulletIcons: [Users, Utensils, MapPin],
+    bullets: [
+      "Logo on the pretzel stand",
+      "Culinary attention magnet",
+      "Presence at a central meeting point",
+    ],
   },
   {
     title: "Coffee Sponsor",
     price: "1,500 EUR",
-    image: coffeeImage.url,
+    image: "/sposlnf/Coffee.jpg",
     icon: Coffee,
-    bullets: ["Logo at the coffee station", "High-frequency touchpoint throughout the day", "Useful sponsor presence with strong visibility"],
+    bulletIcons: [Coffee, Users, Eye],
+    bullets: [
+      "Logo at the coffee station",
+      "High-frequency touchpoint\nthroughout the day",
+      "Useful sponsor presence with\nstrong visibility",
+    ],
   },
   {
     title: "Bavarian Evening Sponsor",
     price: "2,000 EUR",
-    image: eveningImage.url,
+    image: "/654.jpg",
     icon: Star,
-    bullets: ["Prominent visibility during the evening event", "Association with the key social highlight", "Memorable sponsor presence"],
+    bulletIcons: [Gift, Users, Star],
+    bullets: [
+      "Prominent visibility during the evening event",
+      "Association with the key social highlight",
+      "Memorable sponsor presence",
+    ],
   },
 ];
 
-function Brand() {
+function Brand({ showTagline = false }: { showTagline?: boolean }) {
   return (
-    <a href="#overview" className="flex shrink-0 items-center gap-3" aria-label="LNF home">
-      <span className="brand-mark">LNF</span>
-      <span className="h-10 w-px bg-highlight" />
-      <span className="hidden text-sm font-bold leading-[1.05] text-ink sm:block">Logistics<br />Network<br />Federation</span>
+    <a
+      href="#overview"
+      className={`flex shrink-0 items-center gap-5 ${showTagline ? "min-w-0 flex-1" : ""}`}
+      aria-label="LNF home"
+    >
+      <img
+        src="/Logo%20(3).png"
+        alt="Logistics Network Federation"
+        className="h-20 w-auto max-w-[min(78vw,560px)] object-contain object-left md:h-32"
+      />
+      {showTagline ? (
+        <span className="ml-auto hidden text-right text-[0.65rem] font-black uppercase leading-[1.35] tracking-[0.16em] text-sky sm:block">
+          Stronger networks
+          <br />
+          Brighter tomorrows
+          <span className="mr-auto mt-2 block h-0.5 w-7 bg-highlight" />
+        </span>
+      ) : null}
     </a>
   );
 }
@@ -194,12 +261,123 @@ function SectionHeading({ children, intro }: { children: React.ReactNode; intro?
   );
 }
 
+function AnimatedWave() {
+  return (
+    <div className="overview-wave" aria-hidden="true">
+      <svg
+        className="animated-wave"
+        viewBox="0 0 1440 490"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          className="hero-wave-0"
+          d="M 0,125 C 138.13,156.47 276.27,187.93 456,174 C 635.73,160.07 857.07,100.73 1028,85 C 1198.93,69.27 1319.47,97.13 1440,125"
+          fill="none"
+          stroke="#011f4b"
+          strokeOpacity="0.53"
+          strokeWidth="180"
+        />
+        <path
+          className="hero-wave-1"
+          d="M 0,291 C 135.47,298.6 270.93,306.2 443,304 C 615.07,301.8 823.73,289.8 996,286 C 1168.27,282.2 1304.13,286.6 1440,291"
+          fill="none"
+          stroke="#011f4b"
+          strokeWidth="120"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function ScrollTypewriter({ text, loop = false }: { text: string; loop?: boolean }) {
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+  const [typedText, setTypedText] = useState("");
+
+  useEffect(() => {
+    const element = textRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasEnteredView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!hasEnteredView) return;
+
+    let characterIndex = 0;
+    let typingTimer: number;
+    let pauseTimer: number;
+
+    const typeNextCharacter = () => {
+      characterIndex += 1;
+      setTypedText(text.slice(0, characterIndex));
+
+      if (characterIndex < text.length) {
+        typingTimer = window.setTimeout(typeNextCharacter, 65);
+      } else if (loop) {
+        pauseTimer = window.setTimeout(() => {
+          characterIndex = 0;
+          setTypedText("");
+          typeNextCharacter();
+        }, 1600);
+      }
+    };
+
+    typeNextCharacter();
+
+    return () => {
+      window.clearTimeout(typingTimer);
+      window.clearTimeout(pauseTimer);
+    };
+  }, [hasEnteredView, loop, text]);
+
+  return (
+    <span ref={textRef} aria-label={text}>
+      {typedText}
+      {hasEnteredView && typedText.length < text.length ? (
+        <span className="ml-1 animate-pulse" aria-hidden="true">
+          |
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-2.5">
       {items.map((item) => (
         <li key={item} className="flex gap-2.5 text-sm leading-snug text-ink/85">
-          <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-sky text-surface"><Check className="size-3.5" strokeWidth={3} /></span>
+          <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-sky text-surface">
+            <Check className="size-3.5" strokeWidth={3} />
+          </span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function OrangeBulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-3">
+      {items.map((item) => (
+        <li key={item} className="flex gap-3 text-sm leading-snug text-ink/85 md:text-base">
+          <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-highlight text-highlight-foreground">
+            <Check className="size-3.5" strokeWidth={3} />
+          </span>
           <span>{item}</span>
         </li>
       ))}
@@ -208,13 +386,66 @@ function BulletList({ items }: { items: string[] }) {
 }
 
 function Index() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<PackageKey>("premium");
   const [representatives, setRepresentatives] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const total = useMemo(() => packageOptions[selectedPackage].price + representatives * 500, [selectedPackage, representatives]);
+  const [typedEventDate, setTypedEventDate] = useState("");
+  const [typedTransportTitle, setTypedTransportTitle] = useState("");
+
+  useEffect(() => {
+    let characterIndex = 0;
+    let typingTimer: number;
+
+    const typeNextCharacter = () => {
+      if (characterIndex < eventDateText.length) {
+        characterIndex += 1;
+        setTypedEventDate(eventDateText.slice(0, characterIndex));
+        typingTimer = window.setTimeout(typeNextCharacter, 65);
+        return;
+      }
+
+      typingTimer = window.setTimeout(() => {
+        characterIndex = 0;
+        setTypedEventDate("");
+        typeNextCharacter();
+      }, 1500);
+    };
+
+    typeNextCharacter();
+
+    return () => window.clearTimeout(typingTimer);
+  }, []);
+
+  useEffect(() => {
+    let characterIndex = 0;
+    let typingTimer: number;
+
+    const typeNextCharacter = () => {
+      if (characterIndex < transportTitleText.length) {
+        characterIndex += 1;
+        setTypedTransportTitle(transportTitleText.slice(0, characterIndex));
+        typingTimer = window.setTimeout(typeNextCharacter, 65);
+        return;
+      }
+
+      typingTimer = window.setTimeout(() => {
+        characterIndex = 0;
+        setTypedTransportTitle("");
+        typeNextCharacter();
+      }, 1500);
+    };
+
+    typeNextCharacter();
+
+    return () => window.clearTimeout(typingTimer);
+  }, []);
+
+  const total = useMemo(
+    () => packageOptions[selectedPackage].price + representatives * 500,
+    [selectedPackage, representatives],
+  );
 
   const submitInquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -240,170 +471,440 @@ function Index() {
     event.currentTarget.reset();
   };
 
-  const jumpTo = (id: string) => {
-    setMenuOpen(false);
-    document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <main className="overflow-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-50 border-b border-line/70 bg-surface/95 backdrop-blur">
-        <div className="page-shell grid h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:flex">
-          <Brand />
-          <nav className="ml-auto hidden items-center gap-5 lg:flex" aria-label="Main navigation">
-            {[["Overview", "#overview"], ["Packages", "#packages"], ["Booth Concept", "#concept"], ["Sponsorship", "#sponsorship"], ["Wall of Fame", "#wall-of-fame"], ["Contact", "#contact"]].map(([label, href]) => (
-              <a key={href} href={href} className="text-xs font-bold text-ink/75 transition-colors hover:text-sky">{label}</a>
-            ))}
-          </nav>
-          <Button onClick={() => jumpTo("#contact")} className="hidden h-11 bg-highlight px-5 font-extrabold text-highlight-foreground shadow-none hover:bg-highlight/90 xl:inline-flex">
-            Secure your participation <ArrowRight />
-          </Button>
-          <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Toggle menu" onClick={() => setMenuOpen((open) => !open)}>
-            {menuOpen ? <X /> : <Menu />}
+      <header className="sticky top-0 z-[22] bg-surface/95 backdrop-blur">
+        <div className="page-shell flex h-32 items-center gap-4">
+          <Brand showTagline />
+          <Button
+            asChild
+            className="hidden h-11 shrink-0 bg-highlight px-5 text-sm font-black text-highlight-foreground hover:bg-highlight/90 sm:inline-flex"
+          >
+            <a href="#contact">
+              Reserve Your Spot <ArrowRight />
+            </a>
           </Button>
         </div>
-        {menuOpen ? (
-          <nav className="border-t border-line bg-surface px-5 py-4 lg:hidden" aria-label="Mobile navigation">
-            {[["Overview", "#overview"], ["Packages", "#packages"], ["Booth Concept", "#concept"], ["Sponsorship", "#sponsorship"], ["Wall of Fame", "#wall-of-fame"], ["Contact", "#contact"]].map(([label, href]) => (
-              <a key={href} href={href} onClick={() => setMenuOpen(false)} className="block border-b border-line/60 py-3 text-sm font-bold text-ink">{label}</a>
-            ))}
-          </nav>
-        ) : null}
       </header>
 
       <section id="overview" className="relative bg-surface scroll-mt-20">
-        <div className="page-shell pt-8 md:pt-12">
-          <div className="mb-6 flex items-start justify-between gap-6">
-            <Brand />
-            <p className="max-w-44 text-right text-[11px] font-extrabold uppercase leading-relaxed text-ink tracking-[0.18em]">Stronger networks<br />brighter tomorrows<span className="ml-auto mt-2 block h-1 w-9 bg-highlight" /></p>
-          </div>
-        </div>
-        <div className="relative mx-auto max-w-[1440px]">
-          <img src={boothHero.url} alt="LNF shared booth at a busy international logistics exhibition" className="h-[45vh] min-h-[360px] w-full object-cover object-center md:h-[58vh]" />
-          <div className="absolute right-6 top-8 hidden border-l-4 border-highlight bg-ink/80 px-5 py-4 text-sm font-black uppercase leading-relaxed text-surface md:block">People.<br />Partnerships.<br />Progress.</div>
+        <div className="hero-image-frame pointer-events-none relative z-[70] mx-auto -mt-12 max-w-[1440px] md:-mt-20">
+          <img
+            src="/7.jpg"
+            alt="LNF shared booth at a busy international logistics exhibition"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="hero-image block h-auto w-full object-contain"
+          />
         </div>
         <div className="relative">
+          <AnimatedWave />
           <div className="page-shell pb-12 pt-9 md:pb-16 md:pt-12">
             <div className="max-w-5xl">
-              <h1 className="text-[clamp(2.5rem,6vw,5.5rem)] font-black leading-[0.94] text-ink">Visible together at <span className="block text-sky">transport logistic 2027</span></h1>
+              <h1 className="text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
+                Visible together at{" "}
+                <span className="text-sky" aria-label={transportTitleText}>
+                  {typedTransportTitle}
+                  {typedTransportTitle.length < transportTitleText.length ? (
+                    <span className="ml-1 animate-pulse" aria-hidden="true">
+                      |
+                    </span>
+                  ) : null}
+                </span>
+              </h1>
               <span className="title-rule mt-5" />
-              <p className="mt-4 text-xl font-extrabold text-ink md:text-2xl">The LNF Shared Booth — 7 Networks. One Booth. Countless Connections.</p>
-              <p className="mt-4 max-w-4xl text-base leading-relaxed text-ink/80 md:text-lg">Present your company as part of a professional 120 m² head booth in Munich. Benefit from the combined strength of seven partner networks, maximum visibility and valuable contacts. Enjoy all-day catering, optional Wall of Fame visibility for your members and a traditional Bavarian networking evening.</p>
+              <p className="mt-4 text-xl font-extrabold text-ink md:text-2xl">
+                The LNF Shared Booth — 7 Networks. One Booth. Countless Connections.
+              </p>
+              <p className="mt-4 max-w-4xl text-base leading-relaxed text-ink/80 md:text-lg">
+                Present your company as part of a professional 120 m² head booth in Munich. Benefit
+                from the combined strength of seven partner networks, maximum visibility and
+                valuable contacts. Enjoy all-day catering, optional Wall of Fame visibility for your
+                members and a traditional Bavarian networking evening.
+              </p>
             </div>
             <div className="mt-8 grid grid-cols-2 border-y border-line py-6 sm:grid-cols-3 lg:grid-cols-5">
               {featureItems.map(({ icon: Icon, text }, index) => (
-                <div key={text} className={`flex flex-col items-center px-3 py-3 text-center ${index !== 0 ? "border-l border-line" : ""}`}>
-                  <span className="grid size-14 place-items-center rounded-full border-2 border-highlight text-ink"><Icon className="size-7" /></span>
-                  <span className="mt-3 whitespace-pre-line text-sm font-extrabold leading-tight text-ink">{text}</span>
+                <div
+                  key={text}
+                  className={`group flex flex-col items-center px-3 py-5 text-center ${index !== 0 ? "border-l border-line" : ""}`}
+                >
+                  <span className="grid size-20 place-items-center rounded-full border-2 border-highlight text-ink transition-transform duration-700 ease-in-out group-hover:rotate-[360deg] motion-reduce:transition-none motion-reduce:group-hover:rotate-0">
+                    <Icon className="size-10" />
+                  </span>
+                  <span className="mt-4 whitespace-pre-line text-lg font-extrabold leading-tight text-ink">
+                    {text}
+                  </span>
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-ink/65">Participating networks</p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-              {networks.map(([mark, name]) => <div key={name} className="flex min-h-20 items-center gap-2 border-r border-line px-2"><strong className="text-xl font-black text-sky">{mark}</strong><span className="text-[10px] font-extrabold leading-tight text-ink">{name}</span></div>)}
+            <p className="mt-5 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-ink/65">
+              Participating networks
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+              {networkLogos.map(({ src, alt }) => (
+                <div
+                  key={src}
+                  className="group flex min-h-24 items-center justify-center border-r border-line px-3 py-3"
+                >
+                  <img
+                    src={src}
+                    alt={alt}
+                    loading="lazy"
+                    className="max-h-16 w-full object-contain transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                </div>
+              ))}
             </div>
-            <div className="mt-7 flex flex-wrap items-end justify-between gap-3 text-xs font-bold text-ink/65"><span>Exhibition Offer&nbsp; | &nbsp;transport logistic 2027&nbsp; | &nbsp;Munich</span><span>26–29 April 2027 · Messe München</span><strong className="uppercase tracking-[0.2em] text-ink">Munich connects the world.</strong></div>
+            <div className="mt-7 flex flex-wrap items-end justify-between gap-3 text-xs font-bold text-ink/65">
+              <span>
+                Exhibition Offer&nbsp; | &nbsp;transport logistic 2027&nbsp; | &nbsp;Munich
+              </span>
+              <span aria-label={eventDateText}>
+                {typedEventDate}
+                {typedEventDate.length < eventDateText.length ? (
+                  <span className="ml-0.5 animate-pulse" aria-hidden="true">
+                    |
+                  </span>
+                ) : null}
+              </span>
+              <strong className="uppercase tracking-[0.2em] text-ink">
+                Munich connects the world.
+              </strong>
+            </div>
           </div>
-          <div className="city-wave" />
         </div>
       </section>
 
       <section id="packages" className="page-band scroll-mt-20">
         <div className="page-shell">
-          <SectionHeading intro="Choose the format that best fits your trade fair presence.">Participation Packages <span className="text-sky">at a Glance</span></SectionHeading>
+          <SectionHeading intro="Choose the format that best fits your trade fair presence.">
+            Participation Packages <span className="text-sky"><ScrollTypewriter text="at a Glance" /></span>
+          </SectionHeading>
           <div className="grid gap-5 lg:grid-cols-2">
             {packages.map((pkg) => (
-              <article key={pkg.key} className={`package-card ${selectedPackage === pkg.key ? "ring-2 ring-sky" : ""}`}>
+              <article
+                key={pkg.key}
+                className={`package-card group transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${selectedPackage === pkg.key ? "ring-2 ring-sky" : ""}`}
+              >
                 <div className="relative overflow-hidden rounded-t-[6px]">
-                  <img src={pkg.image} alt={pkg.title} className="h-52 w-full object-cover" />
-                  {pkg.top ? <span className="absolute right-0 top-0 bg-sky px-4 py-2 text-xs font-black uppercase text-surface"><Star className="mr-1 inline size-4 fill-current" /> Our top package</span> : null}
+                  <img
+                    src={pkg.image}
+                    alt={pkg.title}
+                    className="h-80 w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                  {pkg.top ? (
+                    <span className="absolute right-0 top-0 flex items-center gap-2 bg-sky px-4 py-3 text-[10px] font-black uppercase leading-tight tracking-[0.08em] text-surface shadow-md">
+                      <Star className="size-6 shrink-0 fill-current" />
+                      <span>
+                        Our top
+                        <br />
+                        package
+                      </span>
+                    </span>
+                  ) : null}
                 </div>
                 <div className="p-5">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-                    <h3 className="min-w-0 text-lg font-black text-ink">{pkg.category}{pkg.category ? " | " : ""}{pkg.title}</h3>
-                    <span className="shrink-0 text-xl font-black text-sky underline decoration-highlight decoration-2 underline-offset-8">{pkg.price}</span>
+                    <h3 className="min-w-0 text-lg font-black text-ink">
+                      {pkg.category}
+                      {pkg.category ? " | " : ""}
+                      {pkg.title}
+                    </h3>
+                    <span className="shrink-0 text-xl font-black text-sky underline decoration-highlight decoration-2 underline-offset-8">
+                      {pkg.price}
+                    </span>
                   </div>
-                  <div className="mt-5"><BulletList items={pkg.bullets} /></div>
-                  <Button onClick={() => { setSelectedPackage(pkg.key); jumpTo("#contact"); }} variant="outline" className="mt-6 w-full border-sky text-sky shadow-none hover:bg-sky hover:text-surface">Select this package</Button>
+                  <div className="mt-5">
+                    <BulletList items={pkg.bullets} />
+                  </div>
+                  <Button
+                    asChild
+                    className="mt-6 w-full bg-highlight font-black text-highlight-foreground hover:bg-highlight/90"
+                  >
+                    <a href="/application">
+                      Join Us <ArrowRight />
+                    </a>
+                  </Button>
                 </div>
               </article>
             ))}
           </div>
-          <div className="mt-6 grid gap-4 rounded-lg bg-panel p-5 md:grid-cols-[1.35fr_2fr] md:items-center">
-            <div className="flex items-center gap-4"><span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-highlight"><Users className="size-7 text-ink" /></span><p className="text-sm font-bold text-ink">Additional full-event booth representative: <strong className="text-sky">500 EUR</strong><br /><span className="font-normal text-ink/70">incl. exhibitor access, all-day catering and full booth services</span></p></div>
-            <div className="grid grid-cols-4 divide-x divide-sky/40 text-center">{[["14x", "Category 1"], ["5x", "Category 2"], ["5x", "Category 3"], ["15x", "Wall of Fame"]].map(([count, label]) => <div key={label} className="px-2"><strong className="block text-xl text-ink">{count}</strong><span className="text-xs text-ink/70">{label}</span></div>)}</div>
+          <div className="mt-6 grid gap-6 rounded-lg bg-panel p-6 transition-transform duration-300 hover:-translate-y-1 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:grid-cols-[1.35fr_2fr] md:items-center">
+            <div className="flex items-center gap-5">
+              <span className="group grid size-16 shrink-0 place-items-center rounded-full border-2 border-highlight text-ink">
+                <Users className="size-8 transition-transform duration-500 group-hover:animate-spin motion-reduce:animate-none" />
+              </span>
+              <p className="text-base font-bold text-ink md:text-lg">
+                Additional full-event booth representative:{" "}
+                <strong className="text-xl text-sky md:text-2xl">500 EUR</strong>
+                <br />
+                <span className="text-sm font-normal leading-snug text-ink/70 md:text-base">
+                  incl. exhibitor access, all-day catering and full booth services
+                </span>
+              </p>
+            </div>
+            <div className="flex items-center gap-5">
+              <span className="group grid size-16 shrink-0 place-items-center rounded-full border-2 border-highlight text-ink">
+                <Hourglass className="size-8 transition-transform duration-500 group-hover:animate-spin motion-reduce:animate-none" />
+              </span>
+              <div className="grid min-w-0 flex-1 grid-cols-4 divide-x divide-sky/40 text-center">
+                {[
+                  ["14x", "Category 1"],
+                  ["5x", "Category 2"],
+                  ["5x", "Category 3"],
+                  ["15x", "Wall of Fame"],
+                ].map(([count, label]) => (
+                  <div key={label} className="px-2">
+                    <strong className="block text-2xl font-black text-ink md:text-3xl">{count}</strong>
+                    <span className="text-xs font-bold text-ink/70 md:text-sm">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <p className="mt-4 text-xs text-ink/60">All prices are net prices in EUR. Applicable taxes, if any, will be added.</p>
+          <p className="mt-4 text-xs text-ink/60">
+            <ScrollTypewriter text="All prices are net prices in EUR. Applicable taxes, if any, will be added." />
+          </p>
         </div>
+        <AnimatedWave />
       </section>
 
       <section id="concept" className="scroll-mt-20 bg-surface">
-        <div className="relative mx-auto max-w-[1440px]"><img src={boothHero.url} alt="Open LNF networking booth concept" className="h-[42vh] min-h-[340px] w-full object-cover" /><div className="absolute bottom-6 right-6 border-l-4 border-highlight bg-ink/85 px-5 py-4 text-sm font-black uppercase tracking-[0.08em] text-surface">People connect markets</div></div>
-        <div className="page-shell py-14">
-          <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">More than booth space:<br /><span className="text-sky">a true networking happening</span></SectionHeading>
-          <h3 className="mb-5 text-2xl font-black text-ink">Why take part?</h3>
-          <div className="grid grid-cols-2 gap-5 md:grid-cols-5">
-            {[{ icon: Users, text: "7 partner networks on one booth" }, { icon: Expand, text: "120 m² professional shared booth" }, { icon: Globe2, text: "International visibility & new contacts" }, { icon: Utensils, text: "All-day catering for exhibitors" }, { icon: Handshake, text: "Open networking space with high visitor appeal" }].map(({ icon: Icon, text }) => <div key={text} className="concept-item"><span className="grid size-14 place-items-center rounded-full border-2 border-highlight"><Icon className="size-7" /></span><strong>{text}</strong></div>)}
-          </div>
-          <div className="mt-10 grid gap-8 lg:grid-cols-[1.5fr_0.8fr]">
-            <div>
-              <h3 className="mb-5 text-2xl font-black text-ink">What else to expect</h3>
-              <BulletList items={["Traditional Bavarian networking evening in Munich", "Additional full-event booth representative: 500 EUR — incl. exhibitor access, all-day catering and full booth services.", "Category 1 includes daily 30-minute meeting room usage", "Presence without travel possible via the Wall of Fame"]} />
-            </div>
-            <aside className="rounded-lg bg-panel p-5">
-              <h3 className="text-xl font-black text-ink underline decoration-highlight decoration-2 underline-offset-8">Booth Concept</h3>
-              <p className="mt-4 text-sm leading-relaxed text-ink/75">An open, inviting and high-quality setup with individual counters, branded shared high tables, a meeting room, a bar and a central networking area.</p>
-              <div className="mt-5 grid aspect-[4/3] place-items-center border-2 border-sky/30 bg-surface p-5"><div className="grid size-full grid-cols-3 gap-2 border-4 border-ink/70 p-3">{Array.from({ length: 9 }).map((_, i) => <span key={i} className={`border border-sky/50 ${i === 4 ? "bg-sky" : "bg-panel"}`} />)}</div></div>
-            </aside>
+        <div className="relative w-full">
+          <img
+                src="/7.jpg"
+            alt="Open LNF networking booth concept"
+            className="h-[42vh] min-h-[340px] w-full object-cover"
+          />
+          <div className="absolute bottom-6 right-6 border-l-4 border-highlight bg-ink/85 px-5 py-4 text-sm font-black uppercase tracking-[0.08em] text-surface">
+            People connect markets
           </div>
         </div>
-        <div className="city-wave" />
+        <div className="page-shell py-14">
+          <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">
+            More than booth space:
+            <br />
+            <span className="text-sky">a true networking happening</span>
+          </SectionHeading>
+          <div className="grid gap-10 lg:grid-cols-[1.8fr_0.9fr] lg:items-start">
+            <aside className="order-2 rounded-lg bg-panel p-5 lg:order-2">
+              <h3 className="text-xl font-black text-ink underline decoration-highlight decoration-2 underline-offset-8">
+                Booth Concept
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-ink/75">
+                An open, inviting and high-quality setup with individual counters, branded shared
+                high tables, a meeting room, a bar and a central networking area.
+              </p>
+              <div className="mt-5 overflow-hidden border-2 border-sky/30 bg-surface p-3">
+                <img
+                  src="/Booth.jpg"
+                  alt="LNF shared booth floor plan"
+                  loading="lazy"
+                  className="h-auto max-h-[480px] w-full object-contain"
+                />
+              </div>
+            </aside>
+            <div className="order-1 lg:order-1">
+              <h3 className="mb-5 text-2xl font-black text-ink">Why take part?</h3>
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-5">
+                {[
+                  { icon: Users, text: "7 partner networks on one booth" },
+                  { icon: Expand, text: "120 m² professional shared booth" },
+                  { icon: Globe2, text: "International visibility & new contacts" },
+                  { icon: Utensils, text: "All-day catering for exhibitors" },
+                  { icon: Handshake, text: "Open networking space with high visitor appeal" },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="concept-item group px-2">
+                    <span className="grid size-20 place-items-center rounded-full border-2 border-highlight text-ink transition-transform duration-700 ease-in-out group-hover:rotate-[360deg] motion-reduce:transition-none motion-reduce:group-hover:rotate-0">
+                      <Icon className="size-10" />
+                    </span>
+                    <strong className="text-base leading-tight md:text-lg">{text}</strong>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+                <div>
+                  <h3 className="mb-5 text-2xl font-black text-ink">What else to expect</h3>
+                  <OrangeBulletList
+                    items={[
+                      "Traditional Bavarian networking evening in Munich",
+                      "Additional full-event booth representative: 500 EUR — incl. exhibitor access, all-day catering and full booth services.",
+                      "Category 1 includes daily 30-minute meeting room usage",
+                      "Presence without travel possible via the Wall of Fame",
+                    ]}
+                  />
+                </div>
+                <div className="overflow-hidden rounded-lg border border-line bg-panel shadow-sm">
+                  <img
+                    src="/sposlnf/Bavarian.jpg"
+                    alt="LNF shared booth networking tables"
+                    loading="lazy"
+                    className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="sponsorship" className="page-band scroll-mt-20">
         <div className="page-shell">
-          <SectionHeading intro="Increase your visibility with eye-catching presence formats.">Sponsorship &amp; Additional Options</SectionHeading>
+          <SectionHeading intro="Increase your visibility with eye-catching presence formats.">
+            <strong className="text-4xl font-black md:text-5xl">Sponsorship &amp; Additional Options</strong>
+          </SectionHeading>
           <div className="grid gap-5 lg:grid-cols-2">
-            {sponsors.map(({ title, price, image, icon: Icon, bullets }) => (
-              <article key={title} className="package-card">
-                <img src={image} alt={title} className="h-56 w-full rounded-t-[6px] object-cover" />
-                <div className="p-5"><div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3"><h3 className="min-w-0 text-2xl font-black text-ink">{title}</h3><strong className="shrink-0 rounded bg-highlight px-3 py-1 text-lg text-highlight-foreground">{price}</strong></div><ul className="mt-5 space-y-3">{bullets.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink/80"><span className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-highlight"><Icon className="size-4" /></span>{item}</li>)}</ul></div>
+            {sponsors.map(({ title, price, image, icon: Icon, bulletIcons, bullets }) => (
+              <article
+                key={title}
+                className="package-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              >
+                <img
+                  src={image}
+                  alt={title}
+                  className="h-75 w-full rounded-t-[6px] object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                />
+                <div className="p-6">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                    <h3 className="min-w-0 text-2xl font-black text-ink md:text-3xl">{title}</h3>
+                    <strong className="shrink-0 rounded bg-highlight px-3 py-1 text-xl text-highlight-foreground">
+                      {price}
+                    </strong>
+                  </div>
+                  <ul className="mt-6 space-y-4">
+                    {bullets.map((item, index) => {
+                      const BulletIcon = bulletIcons?.[index] ?? Icon;
+
+                      return (
+                      <li key={item} className="flex items-center gap-5 whitespace-pre-line text-lg font-bold leading-tight text-ink md:text-xl">
+                        <span className="group grid size-14 shrink-0 place-items-center rounded-full border-2 border-highlight text-ink transition-transform duration-700 ease-in-out hover:rotate-[360deg] motion-reduce:transition-none motion-reduce:hover:rotate-0">
+                          <BulletIcon className="size-7" />
+                        </span>
+                        {item}
+                      </li>
+                      );
+                    })}
+                  </ul>
+                  <Button
+                    asChild
+                    className="mt-7 w-full bg-highlight font-black text-highlight-foreground hover:bg-highlight/90"
+                  >
+                    <a href="/application">
+                      Join Us <ArrowRight />
+                    </a>
+                  </Button>
+                </div>
               </article>
             ))}
           </div>
           <div id="wall-of-fame" className="scroll-mt-24 pt-10">
-            <h3 className="section-title text-3xl">Further Options</h3><span className="title-rule" />
+            <h3 className="section-title text-3xl">Further Options</h3>
+            <span className="title-rule" />
             <div className="mt-5 grid gap-4 md:grid-cols-3">
-              {[{ icon: MonitorUp, title: "Wall of Fame", price: "950 EUR", text: "Logo, photo and QR code on the presentation wall." }, { icon: Users, title: "Additional full-event booth representative", price: "500 EUR", text: "Incl. exhibitor access, all-day catering and full booth services." }, { icon: Beer, title: "Bavarian Networking Evening", price: "Included", text: "Important: Free of charge to attend." }].map(({ icon: Icon, title, price, text }) => <article key={title} className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5"><span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-highlight"><Icon className="size-7" /></span><div><h4 className="text-sm font-black text-ink">{title}</h4><strong className={price === "Included" ? "rounded bg-success px-2 py-0.5 text-xs text-surface" : "text-sky"}>{price}</strong><p className="mt-1 text-xs text-ink/70">{text}</p></div></article>)}
+              {[
+                {
+                  icon: MonitorUp,
+                  title: "Wall of Fame",
+                  price: "950 EUR",
+                  text: "Logo, photo and QR code on the presentation wall.",
+                },
+                {
+                  icon: Users,
+                  title: "Additional full-event booth representative",
+                  price: "500 EUR",
+                  text: "Incl. exhibitor access, all-day catering and full booth services.",
+                },
+                {
+                  icon: Beer,
+                  title: "Bavarian Networking Evening",
+                  price: "Included",
+                  text: "Important: Free of charge to attend.",
+                },
+              ].map(({ icon: Icon, title, price, text }) => (
+                <article
+                  key={title}
+                  className="group flex min-h-28 items-center gap-5 rounded-lg border border-line bg-surface p-6"
+                >
+                  <span className="grid size-20 shrink-0 place-items-center rounded-full border-2 border-highlight">
+                    <Icon className="size-10 transition-transform duration-700 ease-in-out group-hover:rotate-[360deg] motion-reduce:transition-none motion-reduce:group-hover:rotate-0" />
+                  </span>
+                  <div>
+                    <h4 className="text-base font-black text-ink md:text-lg">{title}</h4>
+                    <strong
+                      className={
+                        price === "Included"
+                          ? "rounded bg-success px-2 py-0.5 text-xs text-surface"
+                          : "text-sky"
+                      }
+                    >
+                      {price}
+                    </strong>
+                    <p className="mt-1 text-xs text-ink/70">{text}</p>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="contact" className="scroll-mt-20 bg-ink text-surface">
-        <div className="page-shell grid gap-10 py-14 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <div className="flex items-center gap-4"><Handshake className="size-16 text-highlight" /><div><h2 className="text-3xl font-black md:text-4xl">Secure your participation now</h2><span className="mt-3 block h-1 w-16 bg-highlight" /></div></div>
-            <p className="mt-6 max-w-md text-surface/75">Spaces are limited. Secure your preferred participation or sponsorship package, or ask for a tailored option today.</p>
-            <div className="mt-8 rounded-lg bg-surface/10 p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-surface/60">Your selection</p>
-              <p className="mt-2 text-lg font-black">{packageOptions[selectedPackage].label}</p>
-              <div className="mt-5 grid grid-cols-[1fr_auto] items-end gap-5"><div><Label htmlFor="representatives" className="text-surface/75">Additional representatives</Label><div className="mt-2 flex items-center gap-2"><Button type="button" variant="outline" size="icon" className="border-surface/30 bg-transparent text-surface hover:bg-surface/10 hover:text-surface" onClick={() => setRepresentatives((n) => Math.max(0, n - 1))}>−</Button><span className="w-8 text-center text-xl font-black">{representatives}</span><Button type="button" variant="outline" size="icon" className="border-surface/30 bg-transparent text-surface hover:bg-surface/10 hover:text-surface" onClick={() => setRepresentatives((n) => Math.min(10, n + 1))}>+</Button></div></div><div className="text-right"><span className="text-xs text-surface/60">Net total</span><strong className="block text-3xl text-highlight">{total.toLocaleString("en-US")} EUR</strong></div></div>
+      <section id="contact" className="scroll-mt-20 bg-surface text-surface">
+        <div className="page-shell py-5 md:py-8">
+          <div className="contact-banner rounded-lg p-4 shadow-lg md:p-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+              <Handshake className="size-14 shrink-0 text-surface md:size-16" />
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xl font-black text-surface md:text-2xl">Secure your participation now</h2>
+                <span className="mt-2 block h-0.5 w-10 bg-highlight" />
+                <p className="mt-2 max-w-2xl text-xs text-surface/80 md:text-sm">
+                  Spaces are limited. Secure your preferred sponsorship package or ask for a tailored option today.
+                </p>
+              </div>
+              <strong className="contact-banner__tagline max-w-32 text-lg text-surface md:text-right md:text-2xl">
+                Together
+                <br />
+                we go further.
+              </strong>
+              <Button
+                asChild
+                className="relative z-10 shrink-0 bg-highlight font-black text-highlight-foreground hover:bg-highlight/90"
+              >
+                <a href="/application">
+                  Fill in the application <ArrowRight />
+                </a>
+              </Button>
             </div>
           </div>
-          <form onSubmit={submitInquiry} className="grid gap-4 rounded-lg bg-surface p-6 text-ink md:grid-cols-2">
-            <div><Label htmlFor="name">Name *</Label><Input id="name" name="name" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="company">Company *</Label><Input id="company" name="company" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="email">Business email *</Label><Input id="email" name="email" type="email" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="phone">Phone</Label><Input id="phone" name="phone" type="tel" className="mt-2 h-11" /></div>
-            <div className="md:col-span-2"><Label htmlFor="package">Selected package</Label><select id="package" value={selectedPackage} onChange={(e) => setSelectedPackage(e.target.value as PackageKey)} className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">{Object.entries(packageOptions).map(([key, item]) => <option key={key} value={key}>{item.label} — {item.price.toLocaleString("en-US")} EUR</option>)}</select></div>
-            <div className="md:col-span-2"><Label htmlFor="message">Message</Label><Textarea id="message" name="message" className="mt-2 min-h-24" placeholder="Tell us about your preferred setup or sponsorship interest." /></div>
-            <div className="md:col-span-2"><Button type="submit" disabled={submitting} className="h-12 w-full bg-highlight text-base font-black text-highlight-foreground hover:bg-highlight/90">{submitting ? "Sending…" : "Request reservation"} <ArrowRight /></Button>{submitted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm font-bold text-success"><Check className="size-4" /> Thank you — your reservation inquiry has been sent to the LNF team.</p> : null}{submitError ? <p role="alert" className="mt-3 text-sm font-bold text-destructive">{submitError}</p> : null}</div>
-          </form>
+          <p className="mt-2 px-1 text-[0.62rem] italic leading-tight text-ink/55">
+            <ScrollTypewriter loop text="Visualisations are for illustration purposes only. Final booth design may vary" />
+          </p>
         </div>
       </section>
 
-      <footer className="bg-deep text-surface"><div className="page-shell flex flex-col gap-5 py-8 sm:flex-row sm:items-end sm:justify-between"><Brand /><div className="text-sm text-surface/65"><p>26–29 April 2027 | Messe München</p><p className="mt-1">Exhibition Offer | transport logistic 2027 | Munich</p></div><strong className="uppercase tracking-[0.2em]">Munich connects<br />the world.</strong></div></footer>
+      <footer className="site-footer border-t border-line/70 bg-white text-ink">
+        <div className="page-shell grid gap-8 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:items-center">
+          <Brand />
+          <div className="text-sm leading-relaxed text-ink/65">
+            <p>26–29 April 2027 | Messe München</p>
+            <p className="mt-1">Exhibition Offer | transport logistic 2027 | Munich</p>
+          </div>
+          <div className="space-y-4 md:text-right">
+            <strong className="block uppercase tracking-[0.2em]">
+              Munich connects
+              <br />
+              the world.
+            </strong>
+            <p className="flex items-center gap-1.5 text-sm font-bold text-ink/75 md:justify-end">
+              <span>
+                <ScrollTypewriter text="Made by LNF with love" />
+              </span>
+              <Heart className="heart-beat size-4 shrink-0 fill-highlight text-highlight" aria-hidden="true" />
+            </p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

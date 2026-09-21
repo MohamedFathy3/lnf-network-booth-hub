@@ -73,7 +73,7 @@
 
 :root {
   --radius: 0.4rem;
-  --background: oklch(0.982 0.008 240);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.25 0.09 258);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -107,7 +107,7 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
   --ink: oklch(0.29 0.12 260);
   --deep: oklch(0.22 0.11 253);
-  --sky: oklch(0.62 0.16 232);
+  --sky: #005581;
   --highlight: oklch(0.79 0.17 83);
   --highlight-foreground: oklch(0.25 0.09 258);
   --panel: oklch(0.955 0.018 238);
@@ -154,6 +154,12 @@
 @layer base {
   * {
     border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
   }
 
   body {
@@ -217,11 +223,192 @@
 }
 
 @utility city-wave {
+  position: relative;
+  overflow: hidden;
   height: 4.5rem;
-  background: linear-gradient(164deg, transparent 0 30%, var(--sky) 31% 45%, var(--ink) 46% 100%);
+  background: var(--deep);
+}
+
+.hero-image-frame {
+  overflow: visible;
+}
+
+.hero-image {
+  position: relative;
+  z-index: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.overview-wave {
+  position: relative;
+  width: 100%;
+  height: 7rem;
+  margin-top: -0.25rem;
+  overflow: hidden;
+  pointer-events: none;
+  background: white;
+}
+
+.animated-wave {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.contact-banner__tagline {
+  font-style: italic;
+  line-height: 0.95;
+}
+
+.contact-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(110deg, var(--deep) 0%, var(--sky) 68%, oklch(0.45 0.15 230) 100%);
+}
+
+.contact-banner::after {
+  position: absolute;
+  right: -8%;
+  bottom: -70%;
+  width: 55%;
+  height: 170%;
+  border-top: 0.25rem solid var(--highlight);
+  border-radius: 50%;
+  content: "";
+  opacity: 0.75;
+  pointer-events: none;
+  transform: rotate(-8deg);
+}
+
+.hero-wave-0 {
+  animation: hero-wave-0 4s linear infinite;
+}
+
+.hero-wave-1 {
+  animation: hero-wave-1 4s linear infinite;
+}
+
+@keyframes hero-wave-0 {
+  0%, 100% { d: path("M 0,125 C 138.13,156.47 276.27,187.93 456,174 C 635.73,160.07 857.07,100.73 1028,85 C 1198.93,69.27 1319.47,97.13 1440,125"); }
+  50% { d: path("M 0,125 C 185.47,106.33 370.93,87.67 546,104 C 721.07,120.33 885.73,171.67 1033,181 C 1180.27,190.33 1310.13,157.67 1440,125"); }
+}
+
+@keyframes hero-wave-1 {
+  0%, 100% { d: path("M 0,291 C 135.47,298.6 270.93,306.2 443,304 C 615.07,301.8 823.73,289.8 996,286 C 1168.27,282.2 1304.13,286.6 1440,291"); }
+  50% { d: path("M 0,291 C 128.93,310.6 257.87,330.2 430,340 C 602.13,349.8 817.47,349.8 993,340 C 1168.53,330.2 1304.27,310.6 1440,291"); }
+}
+
+.overview-wave .city-wave__layer {
+  top: -2.5rem;
+  bottom: auto;
+  left: auto;
+  right: -22%;
+  width: 145%;
+  height: 8rem;
+  border: 0;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: var(--deep);
+  transform: rotate(-6deg);
+}
+
+.overview-wave .city-wave__layer--light {
+  top: -2.15rem;
+  background: color-mix(in oklab, var(--sky) 55%, white);
+}
+
+.overview-wave .city-wave__layer--sky {
+  top: -1.8rem;
+  background: var(--sky);
+}
+
+.overview-wave .city-wave__layer--white {
+  top: -1.45rem;
+  background: white;
+}
+
+.city-wave__layer {
+  position: absolute;
+  top: -10%;
+  right: -6rem;
+  width: 14rem;
+  height: 120%;
+  border-radius: 50% 0 0 50% / 50% 0 0 50%;
+  transform: rotate(3deg);
+  transform-origin: center;
+}
+
+.city-wave__layer--light {
+  right: -6.5rem;
+  background: color-mix(in oklab, var(--sky) 55%, white);
+  animation: wave-drift 12s ease-in-out infinite alternate;
+}
+
+.city-wave__layer--sky {
+  right: -7.25rem;
+  background: var(--sky);
+  animation: wave-drift 9s ease-in-out -2s infinite alternate-reverse;
+}
+
+.city-wave__layer--white {
+  right: -8rem;
+  background: white;
+  animation: wave-drift 14s ease-in-out -4s infinite alternate;
+}
+
+@keyframes wave-drift {
+  from {
+    transform: translateX(-2%) rotate(-6deg);
+  }
+  to {
+    transform: translateX(2%) rotate(-4deg);
+  }
+}
+
+.site-footer img {
+  height: 5rem;
+}
+
+.heart-beat {
+  animation: heart-beat 1.35s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes heart-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.22);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.14);
+  }
+  56% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 640px) {
   .page-band { padding-block: 3rem; }
-  .city-wave { height: 3rem; }
+  .overview-wave { height: 5.5rem; }
+  .overview-wave .city-wave__layer { left: -30%; width: 160%; }
+}
+
+@media (min-width: 1500px) {
+  .page-shell {
+    width: 100%;
+    max-width: none;
+    padding-inline: clamp(2rem, 5vw, 6rem);
+    box-sizing: border-box;
+  }
+
+  .hero-image-frame {
+    width: 100%;
+    max-width: none;
+  }
 }
