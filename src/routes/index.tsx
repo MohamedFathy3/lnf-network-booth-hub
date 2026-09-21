@@ -72,35 +72,43 @@ const packageOptions: Record<PackageKey, { label: string; price: number }> = {
 const networkLogos = [
   {
     src: "/logos/2-dc7caaa3-ffbd-40fe-ace8-c21f5b5f315c.png",
-    alt: "U Line",
+    alt: "JGC Line",
+    href: "https://jgcline.com/",
   },
   {
     src: "/logos/3-997bf5e9-c766-4b4e-9950-9f488b0ccc07.png",
     alt: "Cargo Power Network",
+    href: "https://cargopowernetwork.com/",
   },
   {
     src: "/logos/4-8a8d8c1c-f93a-400e-bd80-d25cbeae01ca.png",
-    alt: "UCONNECT",
+    alt: "UC Network",
+    href: "https://www.uc-network.com/",
   },
   {
     src: "/logos/7-7e000de3-3e3a-4cbd-89ff-58f47f453b78.png",
-    alt: "World Shipping Alliance Elite",
+    alt: "WSA Elite",
+    href: "https://wsa-elite.com/",
   },
   {
     src: "/logos/logo-aic-46c3832e-b9c7-403e-95f0-1d31dd81b472.png",
     alt: "AirCargoGroup",
+    href: "https://aircargogroup.com/",
   },
   {
     src: "/logos/logo-bling-2026-dd67515c-40ac-4e06-bac2-f3bf2c8b42ca.png",
-    alt: "Bling Network",
+    alt: "Bling Logistics Network",
+    href: "https://blinglogisticsnetwork.com/",
   },
   {
     src: "/logos/whatsapp-image-2026-06-11-at-121609-pm-5559bbf1-3e84-48be-bd66-9242d0996534.jpeg",
-    alt: "African Freight Bridge Network",
+    alt: "AFBN Group",
+    href: "https://afbn-group.com/",
   },
   {
     src: "/logos/worldring-logo-new-smarter-by-connecting-black-black-980ad6c6-6633-4bab-87ba-1c645b1b4752.png",
     alt: "WorldRing",
+    href: "https://worldring.org/",
   },
 ];
 
@@ -500,7 +508,7 @@ function Index() {
             asChild
             className="hidden h-11 shrink-0 bg-highlight px-5 text-sm font-black text-highlight-foreground hover:bg-highlight/90 sm:inline-flex"
           >
-            <a href="#contact">
+            <a href="/application">
               Reserve Your Spot <ArrowRight />
             </a>
           </Button>
@@ -563,10 +571,14 @@ function Index() {
               Participating networks
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-              {networkLogos.map(({ src, alt }) => (
-                <div
+              {networkLogos.map(({ src, alt, href }) => (
+                <a
                   key={src}
-                  className="group flex min-h-24 items-center justify-center border-r border-line px-3 py-3"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Visit ${alt}`}
+                  className="group flex min-h-24 items-center justify-center border-r border-line px-3 py-3 transition-opacity duration-200 hover:opacity-90"
                 >
                   <img
                     src={src}
@@ -574,7 +586,7 @@ function Index() {
                     loading="lazy"
                     className="max-h-16 w-full object-contain transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
-                </div>
+                </a>
               ))}
             </div>
             <div className="mt-7 flex flex-wrap items-end justify-between gap-3 text-xs font-bold text-ink/65">
@@ -606,7 +618,7 @@ function Index() {
             {packages.map((pkg) => (
               <article
                 key={pkg.key}
-                className={`package-card group transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${selectedPackage === pkg.key ? "ring-2 ring-sky" : ""}`}
+                className={`package-card group flex flex-col transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${selectedPackage === pkg.key ? "ring-2 ring-sky" : ""}`}
               >
                 <div className="relative overflow-hidden rounded-t-[6px]">
                   <img
@@ -625,7 +637,7 @@ function Index() {
                     </span>
                   ) : null}
                 </div>
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                     <h3 className="min-w-0 text-lg font-black text-ink">
                       {pkg.category}
@@ -636,7 +648,7 @@ function Index() {
                       {pkg.price}
                     </span>
                   </div>
-                  <div className="mt-5">
+                  <div className="mt-5 flex-1">
                     <BulletList items={pkg.bullets} />
                   </div>
                   <Button
@@ -691,15 +703,7 @@ function Index() {
       </section>
 
       <section id="concept" className="scroll-mt-20 bg-surface">
-        <div className="relative w-full">
-          <img
-            src="/7.jpg"
-            alt="Open LNF networking booth concept"
-            className="h-[135vh] min-h-[340px] w-full object-cover"
-          />
-          <ImageWaveOverlay />
-         
-        </div>
+       
         <div className="page-shell py-14">
           <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">
             More than booth space:
@@ -777,21 +781,21 @@ function Index() {
             {sponsors.map(({ title, price, image, icon: Icon, bulletIcons, bullets }) => (
               <article
                 key={title}
-                className="package-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="package-card group flex flex-col transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
                 <img
                   src={image}
                   alt={title}
                   className="h-75 w-full rounded-t-[6px] object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
-                <div className="p-6">
+                <div className="flex flex-1 flex-col p-6">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <h3 className="min-w-0 text-2xl font-black text-ink md:text-3xl">{title}</h3>
                     <strong className="shrink-0 rounded bg-highlight px-3 py-1 text-xl text-highlight-foreground">
                       {price}
                     </strong>
                   </div>
-                  <ul className="mt-6 space-y-4">
+                  <ul className="mt-6 flex-1 space-y-4">
                     {bullets.map((item, index) => {
                       const BulletIcon = bulletIcons?.[index] ?? Icon;
 
