@@ -59,12 +59,22 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-ink: var(--ink);
+  --color-deep: var(--deep);
+  --color-sky: var(--sky);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-success: var(--success);
+  --color-surface: var(--surface);
+  --font-sans: "Arial", "Helvetica Neue", sans-serif;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.4rem;
+  --background: oklch(0.982 0.008 240);
+  --foreground: oklch(0.25 0.09 258);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
@@ -95,6 +105,15 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --ink: oklch(0.29 0.12 260);
+  --deep: oklch(0.22 0.11 253);
+  --sky: oklch(0.62 0.16 232);
+  --highlight: oklch(0.79 0.17 83);
+  --highlight-foreground: oklch(0.25 0.09 258);
+  --panel: oklch(0.955 0.018 238);
+  --line: oklch(0.82 0.08 226);
+  --success: oklch(0.58 0.16 148);
+  --surface: oklch(1 0 0);
 }
 
 .dark {
@@ -140,5 +159,69 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+    scroll-behavior: smooth;
   }
+}
+
+@utility page-shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+@utility page-band {
+  background: var(--background);
+  padding-block: 4rem;
+}
+
+@utility section-title {
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 900;
+  line-height: 0.98;
+}
+
+@utility title-rule {
+  display: block;
+  width: 4.25rem;
+  height: 0.3rem;
+  margin-top: 0.75rem;
+  background: var(--highlight);
+}
+
+@utility brand-mark {
+  color: var(--sky);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 0.8;
+}
+
+@utility package-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: 0 10px 30px color-mix(in oklab, var(--ink) 8%, transparent);
+}
+
+@utility concept-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--ink);
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.15;
+}
+
+@utility city-wave {
+  height: 4.5rem;
+  background: linear-gradient(164deg, transparent 0 30%, var(--sky) 31% 45%, var(--ink) 46% 100%);
+}
+
+@media (max-width: 640px) {
+  .page-band { padding-block: 3rem; }
+  .city-wave { height: 3rem; }
 }
