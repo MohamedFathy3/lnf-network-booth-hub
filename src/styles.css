@@ -262,35 +262,53 @@
 .image-wave-overlay__deep,
 .image-wave-overlay__sky,
 .image-wave-overlay__glint {
-  transform-box: fill-box;
-  transform-origin: center bottom;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
 .image-wave-overlay__deep {
-  animation: image-wave-drift var(--wave-sync-duration) ease-in-out infinite alternate;
+  animation-name: image-wave-deep;
+  animation-duration: var(--wave-sync-duration);
 }
 
 .image-wave-overlay__sky {
-  animation: image-wave-drift var(--wave-sync-duration) ease-in-out -0.15s infinite alternate;
+  animation-name: image-wave-sky;
+  animation-duration: var(--wave-sync-duration);
+  animation-delay: -0.15s;
 }
 
 .image-wave-overlay__glint {
-  animation: image-wave-drift var(--wave-sync-duration) ease-in-out -0.3s infinite alternate;
+  animation-name: image-wave-glint;
+  animation-duration: var(--wave-sync-duration);
+  animation-delay: -0.15s;
 }
 
-@keyframes image-wave-drift {
-  from { transform: translate3d(-1.2%, 0, 0) scaleY(1); }
-  to { transform: translate3d(1.2%, -2%, 0) scaleY(1.03); }
+@keyframes image-wave-deep {
+  from {
+    d: path("M0 72 C 180 94 340 96 520 72 C 704 48 858 42 1040 70 C 1210 96 1320 98 1440 74 L1440 120 L0 120 Z");
+  }
+  to {
+    d: path("M0 72 C 180 106 344 86 520 68 C 704 48 864 57 1040 78 C 1208 98 1320 86 1440 74 L1440 120 L0 120 Z");
+  }
 }
 
-.wave-linked-title {
-  transform-origin: left center;
-  animation: wave-linked-title var(--wave-sync-duration) ease-in-out infinite alternate;
+@keyframes image-wave-sky {
+  from {
+    d: path("M0 90 C 180 112 340 112 520 88 C 704 64 858 58 1040 86 C 1210 112 1320 114 1440 90 L1440 120 L0 120 Z");
+  }
+  to {
+    d: path("M0 90 C 180 120 344 104 520 84 C 704 64 864 74 1040 94 C 1208 116 1320 104 1440 90 L1440 120 L0 120 Z");
+  }
 }
 
-@keyframes wave-linked-title {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, -0.22rem, 0); }
+@keyframes image-wave-glint {
+  from {
+    d: path("M0 73 C 180 95 340 97 520 73 C 704 49 858 43 1040 71 C 1210 97 1320 99 1440 75");
+  }
+  to {
+    d: path("M0 73 C 180 107 344 87 520 69 C 704 49 864 58 1040 79 C 1208 99 1320 87 1440 75");
+  }
 }
 
 .contact-banner__tagline {
@@ -358,8 +376,7 @@
 @media (prefers-reduced-motion: reduce) {
   .image-wave-overlay__deep,
   .image-wave-overlay__sky,
-  .image-wave-overlay__glint,
-  .wave-linked-title {
+  .image-wave-overlay__glint {
     animation: none;
   }
 }

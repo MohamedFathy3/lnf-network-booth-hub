@@ -516,15 +516,10 @@ function Index() {
         <div className="relative">
           <div className="page-shell pb-12 pt-9 md:pb-16 md:pt-12">
             <div className="max-w-5xl">
-              <h1 className="wave-linked-title text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
+              <h1 className="text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
                 Visible together at{" "}
                 <span className="text-sky" aria-label={transportTitleText}>
-                  {typedTransportTitle}
-                  {typedTransportTitle.length < transportTitleText.length ? (
-                    <span className="ml-1 animate-pulse" aria-hidden="true">
-                      |
-                    </span>
-                  ) : null}
+                  {transportTitleText}
                 </span>
               </h1>
               <span className="title-rule mt-5" />
@@ -576,12 +571,7 @@ function Index() {
                 Exhibition Offer&nbsp; | &nbsp;transport logistic 2027&nbsp; | &nbsp;Munich
               </span>
               <span aria-label={eventDateText}>
-                {typedEventDate}
-                {typedEventDate.length < eventDateText.length ? (
-                  <span className="ml-0.5 animate-pulse" aria-hidden="true">
-                    |
-                  </span>
-                ) : null}
+                {eventDateText}
               </span>
               <strong className="uppercase tracking-[0.2em] text-ink">
                 Munich connects the world.
@@ -697,10 +687,7 @@ function Index() {
           </div>
         </div>
         <div className="page-shell py-14">
-          <SectionHeading
-            className="wave-linked-title"
-            intro="The LNF shared booth brings together people, partner networks and business opportunities."
-          >
+          <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">
             More than booth space:
             <br />
             <span className="text-sky">a true networking happening</span>
