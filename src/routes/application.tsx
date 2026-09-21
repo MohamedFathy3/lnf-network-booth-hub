@@ -12,6 +12,8 @@ export const Route = createFileRoute("/application")({
   component: Application,
 });
 
+const applicationApiUrl = "/api/transport-logistics";
+
 function Application() {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
@@ -27,7 +29,7 @@ function Application() {
     const form = new FormData(event.currentTarget);
     const password = String(form.get("password") ?? "");
     try {
-      const response = await fetch("/api/transport-logistics", {
+      const response = await fetch(applicationApiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
