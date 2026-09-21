@@ -269,52 +269,35 @@ function SectionHeading({
   );
 }
 
-function AnimatedWave() {
-  return (
-    <div className="overview-wave" aria-hidden="true">
-      <svg
-        className="animated-wave"
-        viewBox="0 0 1440 320"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          className="hero-wave-0"
-          d="M0 104 C 170 142 320 156 510 116 C 720 72 850 34 1030 70 C 1210 106 1312 144 1440 112 L1440 320 L0 320 Z"
-          fill="var(--deep)"
-          fillOpacity="0.94"
-        />
-        <path
-          className="hero-wave-1"
-          d="M0 190 C 170 214 336 226 530 188 C 744 146 884 116 1055 148 C 1212 178 1310 216 1440 188 L1440 320 L0 320 Z"
-          fill="var(--sky)"
-          fillOpacity="0.96"
-        />
-      </svg>
-    </div>
-  );
-}
-
 function ImageWaveOverlay() {
   return (
     <div className="image-wave-overlay" aria-hidden="true">
       <svg
         className="image-wave-overlay__svg"
-        viewBox="0 0 1440 180"
+        viewBox="0 0 1440 120"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           className="image-wave-overlay__deep"
-          d="M0 78 C 180 122 320 120 510 76 C 704 31 846 28 1032 76 C 1194 118 1312 120 1440 82 L1440 180 L0 180 Z"
+          d="M0 72 C 180 94 340 96 520 72 C 704 48 858 42 1040 70 C 1210 96 1320 98 1440 74 L1440 120 L0 120 Z"
           fill="var(--deep)"
           fillOpacity="0.82"
         />
         <path
           className="image-wave-overlay__sky"
-          d="M0 112 C 180 146 346 148 532 108 C 720 68 864 62 1048 106 C 1218 146 1320 150 1440 118 L1440 180 L0 180 Z"
+          d="M0 90 C 180 112 340 112 520 88 C 704 64 858 58 1040 86 C 1210 112 1320 114 1440 90 L1440 120 L0 120 Z"
           fill="var(--sky)"
-          fillOpacity="0.82"
+          fillOpacity="0.86"
+        />
+        <path
+          className="image-wave-overlay__glint"
+          d="M0 73 C 180 95 340 97 520 73 C 704 49 858 43 1040 71 C 1210 97 1320 99 1440 75"
+          fill="none"
+          stroke="var(--highlight)"
+          strokeOpacity="0.75"
+          strokeWidth="3"
+          vectorEffect="non-scaling-stroke"
         />
       </svg>
     </div>
@@ -531,7 +514,6 @@ function Index() {
           <ImageWaveOverlay />
         </div>
         <div className="relative">
-          <AnimatedWave />
           <div className="page-shell pb-12 pt-9 md:pb-16 md:pt-12">
             <div className="max-w-5xl">
               <h1 className="wave-linked-title text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
@@ -700,7 +682,6 @@ function Index() {
             <ScrollTypewriter text="All prices are net prices in EUR. Applicable taxes, if any, will be added." />
           </p>
         </div>
-        <AnimatedWave />
       </section>
 
       <section id="concept" className="scroll-mt-20 bg-surface">

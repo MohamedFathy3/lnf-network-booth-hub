@@ -247,7 +247,7 @@
   bottom: -1px;
   left: 0;
   z-index: 2;
-  height: clamp(4.5rem, 10vw, 8.5rem);
+  height: clamp(3.5rem, 7vw, 5.5rem);
   overflow: hidden;
   pointer-events: none;
 }
@@ -260,54 +260,27 @@
 }
 
 .image-wave-overlay__deep,
-.image-wave-overlay__sky {
+.image-wave-overlay__sky,
+.image-wave-overlay__glint {
   transform-box: fill-box;
   transform-origin: center bottom;
 }
 
 .image-wave-overlay__deep {
-  animation: image-wave-deep var(--wave-sync-duration) ease-in-out infinite alternate;
+  animation: image-wave-drift var(--wave-sync-duration) ease-in-out infinite alternate;
 }
 
 .image-wave-overlay__sky {
-  animation: image-wave-sky var(--wave-sync-duration) ease-in-out infinite alternate;
+  animation: image-wave-drift var(--wave-sync-duration) ease-in-out -0.15s infinite alternate;
 }
 
-@keyframes image-wave-deep {
-  from { transform: translate3d(-1.5%, 0, 0) scaleY(1); }
-  to { transform: translate3d(1.5%, 4%, 0) scaleY(0.92); }
+.image-wave-overlay__glint {
+  animation: image-wave-drift var(--wave-sync-duration) ease-in-out -0.3s infinite alternate;
 }
 
-@keyframes image-wave-sky {
-  from { transform: translate3d(1.5%, 0, 0) scaleY(1); }
-  to { transform: translate3d(-1.5%, -4%, 0) scaleY(1.06); }
-}
-
-.overview-wave {
-  position: relative;
-  width: 100%;
-  height: clamp(7.5rem, 14vw, 12rem);
-  margin-top: -2.5rem;
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--surface);
-  isolation: isolate;
-}
-
-.overview-wave::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, transparent 0 54%, var(--surface) 100%);
-  content: "";
-}
-
-.animated-wave {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  shape-rendering: geometricPrecision;
+@keyframes image-wave-drift {
+  from { transform: translate3d(-1.2%, 0, 0) scaleY(1); }
+  to { transform: translate3d(1.2%, -2%, 0) scaleY(1.03); }
 }
 
 .wave-linked-title {
@@ -345,92 +318,6 @@
   transform: rotate(-8deg);
 }
 
-.hero-wave-0 {
-  transform-origin: center;
-  animation: hero-wave-0 var(--wave-sync-duration) ease-in-out infinite alternate;
-}
-
-.hero-wave-1 {
-  transform-origin: center;
-  animation: hero-wave-1 var(--wave-sync-duration) ease-in-out infinite alternate;
-}
-
-@keyframes hero-wave-0 {
-  from { transform: translate3d(0, 0, 0) scaleY(1); }
-  to { transform: translate3d(0, 2%, 0) scaleY(0.94); }
-}
-
-@keyframes hero-wave-1 {
-  from { transform: translate3d(0, 0, 0) scaleY(1); }
-  to { transform: translate3d(0, -3%, 0) scaleY(1.05); }
-}
-
-.overview-wave .city-wave__layer {
-  top: -2.5rem;
-  bottom: auto;
-  left: auto;
-  right: -22%;
-  width: 145%;
-  height: 8rem;
-  border: 0;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: var(--deep);
-  transform: rotate(-6deg);
-}
-
-.overview-wave .city-wave__layer--light {
-  top: -2.15rem;
-  background: color-mix(in oklab, var(--sky) 55%, white);
-}
-
-.overview-wave .city-wave__layer--sky {
-  top: -1.8rem;
-  background: var(--sky);
-}
-
-.overview-wave .city-wave__layer--white {
-  top: -1.45rem;
-  background: white;
-}
-
-.city-wave__layer {
-  position: absolute;
-  top: -10%;
-  right: -6rem;
-  width: 14rem;
-  height: 120%;
-  border-radius: 50% 0 0 50% / 50% 0 0 50%;
-  transform: rotate(3deg);
-  transform-origin: center;
-}
-
-.city-wave__layer--light {
-  right: -6.5rem;
-  background: color-mix(in oklab, var(--sky) 55%, white);
-  animation: wave-drift 12s ease-in-out infinite alternate;
-}
-
-.city-wave__layer--sky {
-  right: -7.25rem;
-  background: var(--sky);
-  animation: wave-drift 9s ease-in-out -2s infinite alternate-reverse;
-}
-
-.city-wave__layer--white {
-  right: -8rem;
-  background: white;
-  animation: wave-drift 14s ease-in-out -4s infinite alternate;
-}
-
-@keyframes wave-drift {
-  from {
-    transform: translateX(-2%) rotate(-6deg);
-  }
-  to {
-    transform: translateX(2%) rotate(-4deg);
-  }
-}
-
 .site-footer img {
   height: 5rem;
 }
@@ -461,25 +348,17 @@
 
 @media (max-width: 640px) {
   .page-band { padding-block: 3rem; }
-  .overview-wave { height: clamp(6.5rem, 22vw, 8rem); margin-top: -1.5rem; }
-  .overview-wave .city-wave__layer { left: -30%; width: 160%; }
-  .image-wave-overlay { height: clamp(3.5rem, 16vw, 5.5rem); }
+  .image-wave-overlay { height: clamp(2.75rem, 12vw, 4rem); }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
-  .overview-wave {
-    height: clamp(8rem, 15vw, 10rem);
-    margin-top: -2rem;
-  }
-
-  .image-wave-overlay { height: clamp(4.5rem, 10vw, 6.5rem); }
+  .image-wave-overlay { height: clamp(3.25rem, 7vw, 4.75rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-wave-0,
-  .hero-wave-1,
   .image-wave-overlay__deep,
   .image-wave-overlay__sky,
+  .image-wave-overlay__glint,
   .wave-linked-title {
     animation: none;
   }
