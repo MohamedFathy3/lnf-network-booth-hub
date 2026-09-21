@@ -52,7 +52,23 @@ export default {
       const requestUrl = new URL(request.url);
       if (requestUrl.pathname === "/api/transport-logistics") {
         const upstreamUrl = `${applicationApiOrigin}${requestUrl.pathname}${requestUrl.search}`;
-        return await fetch(new Request(upstreamUrl, request));
+        try {
+          const upstreamRequest = request.clone();
+          return await fetch(
+            new Request(upstreamUrl, {
+              method: upstreamRequest.method,
+              headers: upstreamRequest.headers,
+              body: upstreamRequest.body,
+              redirect: "follow",
+            }),
+          );
+        } catch (error) {
+          console.error("Application API proxy failed", error);
+          return Response.json(
+            { error: "The application service is temporarily unavailable." },
+            { status: 502 },
+          );
+        }
       }
 
       const handler = await getServerEntry();

@@ -42,7 +42,7 @@ function Application() {
           password,
           unhashed_password: password,
           package: String(form.get("package") ?? "").trim(),
-          sponsorship,
+          sponsorship: sponsorship.join(", "),
         }),
       });
 
