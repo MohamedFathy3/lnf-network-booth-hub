@@ -135,10 +135,7 @@ function Application() {
             <Label htmlFor="phone">Phone</Label>
             <Input id="phone" name="phone" type="tel" className="mt-2 h-11" />
           </div>
-          <div>
-            <Label htmlFor="password">Password *</Label>
-            <Input id="password" name="password" type="password" required className="mt-2 h-11" />
-          </div>
+         
           <div>
             <Label htmlFor="package">Package *</Label>
             <select id="package" name="package" className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">
