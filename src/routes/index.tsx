@@ -695,7 +695,7 @@ function Index() {
           <img
             src="/7.jpg"
             alt="Open LNF networking booth concept"
-            className="h-[92vh] min-h-[340px] w-full object-cover"
+            className="h-[135vh] min-h-[340px] w-full object-cover"
           />
           <ImageWaveOverlay />
          
