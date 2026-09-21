@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import boothHero from "@/assets/booth-hero.jpg.asset.json";
+import boothHero from "@/assets/booth-hero-clean.jpg.asset.json";
 import premiumCounter from "@/assets/premium-counter.jpg.asset.json";
 import sharedTable from "@/assets/shared-table.jpg.asset.json";
 import wallFame from "@/assets/wall-fame.jpg.asset.json";
