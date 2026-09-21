@@ -266,24 +266,20 @@ function AnimatedWave() {
     <div className="overview-wave" aria-hidden="true">
       <svg
         className="animated-wave"
-        viewBox="0 0 1440 490"
+        viewBox="0 0 1440 320"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           className="hero-wave-0"
-          d="M 0,125 C 138.13,156.47 276.27,187.93 456,174 C 635.73,160.07 857.07,100.73 1028,85 C 1198.93,69.27 1319.47,97.13 1440,125"
-          fill="none"
-          stroke="#011f4b"
-          strokeOpacity="0.53"
-          strokeWidth="180"
+          d="M0 104 C 170 142 320 156 510 116 C 720 72 850 34 1030 70 C 1210 106 1312 144 1440 112 L1440 320 L0 320 Z"
+          fill="#011f4b"
+          fillOpacity="0.9"
         />
         <path
           className="hero-wave-1"
-          d="M 0,291 C 135.47,298.6 270.93,306.2 443,304 C 615.07,301.8 823.73,289.8 996,286 C 1168.27,282.2 1304.13,286.6 1440,291"
-          fill="none"
-          stroke="#011f4b"
-          strokeWidth="120"
+          d="M0 190 C 170 214 336 226 530 188 C 744 146 884 116 1055 148 C 1212 178 1310 216 1440 188 L1440 320 L0 320 Z"
+          fill="#005581"
         />
       </svg>
     </div>
