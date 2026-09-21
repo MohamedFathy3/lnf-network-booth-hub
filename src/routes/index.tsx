@@ -274,31 +274,29 @@ function ImageWaveOverlay() {
     <div className="image-wave-overlay" aria-hidden="true">
       <svg
         className="image-wave-overlay__svg"
-        viewBox="0 0 1440 120"
+        viewBox="0 24 150 28"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path
-          className="image-wave-overlay__deep"
-          d="M0 72 C 180 94 340 96 520 72 C 704 48 858 42 1040 70 C 1210 96 1320 98 1440 74 L1440 120 L0 120 Z"
-          fill="var(--deep)"
-          fillOpacity="0.82"
-        />
-        <path
-          className="image-wave-overlay__sky"
-          d="M0 90 C 180 112 340 112 520 88 C 704 64 858 58 1040 86 C 1210 112 1320 114 1440 90 L1440 120 L0 120 Z"
-          fill="var(--sky)"
-          fillOpacity="0.86"
-        />
-        <path
-          className="image-wave-overlay__glint"
-          d="M0 73 C 180 95 340 97 520 73 C 704 49 858 43 1040 71 C 1210 97 1320 99 1440 75"
-          fill="none"
-          stroke="var(--highlight)"
-          strokeOpacity="0.75"
-          strokeWidth="3"
-          vectorEffect="non-scaling-stroke"
-        />
+        <defs>
+          <path
+            id="gentle-wave"
+            d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+          />
+        </defs>
+
+        <g className="image-wave-overlay__parallax image-wave-overlay__parallax--1">
+          <use href="#gentle-wave" x="50" y="3" fill="var(--deep)" fillOpacity="0.7" />
+        </g>
+        <g className="image-wave-overlay__parallax image-wave-overlay__parallax--2">
+          <use href="#gentle-wave" x="50" y="0" fill="var(--surface)" fillOpacity="0.28" />
+        </g>
+        <g className="image-wave-overlay__parallax image-wave-overlay__parallax--3">
+          <use href="#gentle-wave" x="50" y="9" fill="var(--sky)" fillOpacity="0.7" />
+        </g>
+        <g className="image-wave-overlay__parallax image-wave-overlay__parallax--4">
+          <use href="#gentle-wave" x="50" y="6" fill="var(--surface)" />
+        </g>
       </svg>
     </div>
   );
@@ -410,7 +408,8 @@ function Index() {
 
   useEffect(() => {
     let characterIndex = 0;
-    let typingTimer: number;
+    let typingTimer: number | undefined;
+    let pauseTimer: number | undefined;
 
     const typeNextCharacter = () => {
       if (characterIndex < eventDateText.length) {
@@ -420,40 +419,47 @@ function Index() {
         return;
       }
 
-      typingTimer = window.setTimeout(() => {
+      pauseTimer = window.setTimeout(() => {
         characterIndex = 0;
         setTypedEventDate("");
         typeNextCharacter();
-      }, 1500);
+      }, 1400);
     };
 
     typeNextCharacter();
 
-    return () => window.clearTimeout(typingTimer);
+    return () => {
+      if (typingTimer) window.clearTimeout(typingTimer);
+      if (pauseTimer) window.clearTimeout(pauseTimer);
+    };
   }, []);
 
   useEffect(() => {
     let characterIndex = 0;
-    let typingTimer: number;
+    let typingTimer: number | undefined;
+    let pauseTimer: number | undefined;
 
     const typeNextCharacter = () => {
       if (characterIndex < transportTitleText.length) {
         characterIndex += 1;
         setTypedTransportTitle(transportTitleText.slice(0, characterIndex));
-        typingTimer = window.setTimeout(typeNextCharacter, 65);
+        typingTimer = window.setTimeout(typeNextCharacter, 70);
         return;
       }
 
-      typingTimer = window.setTimeout(() => {
+      pauseTimer = window.setTimeout(() => {
         characterIndex = 0;
         setTypedTransportTitle("");
         typeNextCharacter();
-      }, 1500);
+      }, 1400);
     };
 
     typeNextCharacter();
 
-    return () => window.clearTimeout(typingTimer);
+    return () => {
+      if (typingTimer) window.clearTimeout(typingTimer);
+      if (pauseTimer) window.clearTimeout(pauseTimer);
+    };
   }, []);
 
   const total = useMemo(
@@ -519,7 +525,12 @@ function Index() {
               <h1 className="text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
                 Visible together at{" "}
                 <span className="text-sky" aria-label={transportTitleText}>
-                  {transportTitleText}
+                  {typedTransportTitle}
+                  {typedTransportTitle.length < transportTitleText.length ? (
+                    <span className="ml-1 animate-pulse" aria-hidden="true">
+                      |
+                    </span>
+                  ) : null}
                 </span>
               </h1>
               <span className="title-rule mt-5" />
@@ -571,7 +582,12 @@ function Index() {
                 Exhibition Offer&nbsp; | &nbsp;transport logistic 2027&nbsp; | &nbsp;Munich
               </span>
               <span aria-label={eventDateText}>
-                {eventDateText}
+                {typedEventDate}
+                {typedEventDate.length < eventDateText.length ? (
+                  <span className="ml-1 animate-pulse" aria-hidden="true">
+                    |
+                  </span>
+                ) : null}
               </span>
               <strong className="uppercase tracking-[0.2em] text-ink">
                 Munich connects the world.
@@ -679,12 +695,10 @@ function Index() {
           <img
             src="/7.jpg"
             alt="Open LNF networking booth concept"
-            className="h-[42vh] min-h-[340px] w-full object-cover"
+            className="h-[92vh] min-h-[340px] w-full object-cover"
           />
           <ImageWaveOverlay />
-          <div className="absolute bottom-6 right-6 border-l-4 border-highlight bg-ink/85 px-5 py-4 text-sm font-black uppercase tracking-[0.08em] text-surface">
-            People connect markets
-          </div>
+         
         </div>
         <div className="page-shell py-14">
           <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">
