@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 import boothHero from "@/assets/booth-hero-clean.jpg.asset.json";
 import premiumCounter from "@/assets/premium-counter.jpg.asset.json";
 import sharedTable from "@/assets/shared-table.jpg.asset.json";
@@ -211,11 +212,32 @@ function Index() {
   const [selectedPackage, setSelectedPackage] = useState<PackageKey>("premium");
   const [representatives, setRepresentatives] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const total = useMemo(() => packageOptions[selectedPackage].price + representatives * 500, [selectedPackage, representatives]);
 
-  const submitInquiry = (event: FormEvent<HTMLFormElement>) => {
+  const submitInquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitting(true);
+    setSubmitError("");
+    const form = new FormData(event.currentTarget);
+    const { error } = await supabase.from("reservation_inquiries").insert({
+      name: String(form.get("name") ?? "").trim(),
+      company: String(form.get("company") ?? "").trim(),
+      email: String(form.get("email") ?? "").trim(),
+      phone: String(form.get("phone") ?? "").trim() || null,
+      selected_package: selectedPackage,
+      additional_representatives: representatives,
+      message: String(form.get("message") ?? "").trim() || null,
+      quoted_net_total: total,
+    });
+    setSubmitting(false);
+    if (error) {
+      setSubmitError("Your inquiry could not be sent. Please try again.");
+      return;
+    }
     setSubmitted(true);
+    event.currentTarget.reset();
   };
 
   const jumpTo = (id: string) => {
@@ -370,13 +392,13 @@ function Index() {
             </div>
           </div>
           <form onSubmit={submitInquiry} className="grid gap-4 rounded-lg bg-surface p-6 text-ink md:grid-cols-2">
-            <div><Label htmlFor="name">Name *</Label><Input id="name" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="company">Company *</Label><Input id="company" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="email">Business email *</Label><Input id="email" type="email" required className="mt-2 h-11" /></div>
-            <div><Label htmlFor="phone">Phone</Label><Input id="phone" type="tel" className="mt-2 h-11" /></div>
+            <div><Label htmlFor="name">Name *</Label><Input id="name" name="name" required className="mt-2 h-11" /></div>
+            <div><Label htmlFor="company">Company *</Label><Input id="company" name="company" required className="mt-2 h-11" /></div>
+            <div><Label htmlFor="email">Business email *</Label><Input id="email" name="email" type="email" required className="mt-2 h-11" /></div>
+            <div><Label htmlFor="phone">Phone</Label><Input id="phone" name="phone" type="tel" className="mt-2 h-11" /></div>
             <div className="md:col-span-2"><Label htmlFor="package">Selected package</Label><select id="package" value={selectedPackage} onChange={(e) => setSelectedPackage(e.target.value as PackageKey)} className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">{Object.entries(packageOptions).map(([key, item]) => <option key={key} value={key}>{item.label} — {item.price.toLocaleString("en-US")} EUR</option>)}</select></div>
-            <div className="md:col-span-2"><Label htmlFor="message">Message</Label><Textarea id="message" className="mt-2 min-h-24" placeholder="Tell us about your preferred setup or sponsorship interest." /></div>
-            <div className="md:col-span-2"><Button type="submit" className="h-12 w-full bg-highlight text-base font-black text-highlight-foreground hover:bg-highlight/90">Request reservation <ArrowRight /></Button>{submitted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm font-bold text-success"><Check className="size-4" /> Thank you — your reservation inquiry is ready for the LNF team.</p> : null}</div>
+            <div className="md:col-span-2"><Label htmlFor="message">Message</Label><Textarea id="message" name="message" className="mt-2 min-h-24" placeholder="Tell us about your preferred setup or sponsorship interest." /></div>
+            <div className="md:col-span-2"><Button type="submit" disabled={submitting} className="h-12 w-full bg-highlight text-base font-black text-highlight-foreground hover:bg-highlight/90">{submitting ? "Sending…" : "Request reservation"} <ArrowRight /></Button>{submitted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm font-bold text-success"><Check className="size-4" /> Thank you — your reservation inquiry has been sent to the LNF team.</p> : null}{submitError ? <p role="alert" className="mt-3 text-sm font-bold text-destructive">{submitError}</p> : null}</div>
           </form>
         </div>
       </section>
