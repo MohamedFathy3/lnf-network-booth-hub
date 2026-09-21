@@ -251,10 +251,18 @@ function Brand({ showTagline = false }: { showTagline?: boolean }) {
   );
 }
 
-function SectionHeading({ children, intro }: { children: React.ReactNode; intro?: string }) {
+function SectionHeading({
+  children,
+  intro,
+  className = "",
+}: {
+  children: React.ReactNode;
+  intro?: string;
+  className?: string;
+}) {
   return (
     <div className="mb-8">
-      <h2 className="section-title">{children}</h2>
+      <h2 className={`section-title ${className}`}>{children}</h2>
       <span className="title-rule" />
       {intro ? <p className="mt-2 max-w-3xl text-lg text-ink/80 md:text-xl">{intro}</p> : null}
     </div>
@@ -273,13 +281,40 @@ function AnimatedWave() {
         <path
           className="hero-wave-0"
           d="M0 104 C 170 142 320 156 510 116 C 720 72 850 34 1030 70 C 1210 106 1312 144 1440 112 L1440 320 L0 320 Z"
-          fill="#011f4b"
-          fillOpacity="0.9"
+          fill="var(--deep)"
+          fillOpacity="0.94"
         />
         <path
           className="hero-wave-1"
           d="M0 190 C 170 214 336 226 530 188 C 744 146 884 116 1055 148 C 1212 178 1310 216 1440 188 L1440 320 L0 320 Z"
-          fill="#005581"
+          fill="var(--sky)"
+          fillOpacity="0.96"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function ImageWaveOverlay() {
+  return (
+    <div className="image-wave-overlay" aria-hidden="true">
+      <svg
+        className="image-wave-overlay__svg"
+        viewBox="0 0 1440 180"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          className="image-wave-overlay__deep"
+          d="M0 78 C 180 122 320 120 510 76 C 704 31 846 28 1032 76 C 1194 118 1312 120 1440 82 L1440 180 L0 180 Z"
+          fill="var(--deep)"
+          fillOpacity="0.82"
+        />
+        <path
+          className="image-wave-overlay__sky"
+          d="M0 112 C 180 146 346 148 532 108 C 720 68 864 62 1048 106 C 1218 146 1320 150 1440 118 L1440 180 L0 180 Z"
+          fill="var(--sky)"
+          fillOpacity="0.82"
         />
       </svg>
     </div>
@@ -493,12 +528,13 @@ function Index() {
             decoding="async"
             className="hero-image block h-auto w-full object-contain"
           />
+          <ImageWaveOverlay />
         </div>
         <div className="relative">
           <AnimatedWave />
           <div className="page-shell pb-12 pt-9 md:pb-16 md:pt-12">
             <div className="max-w-5xl">
-              <h1 className="text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
+              <h1 className="wave-linked-title text-[clamp(1.75rem,4vw,3.25rem)] font-black leading-[0.98] text-ink md:whitespace-nowrap">
                 Visible together at{" "}
                 <span className="text-sky" aria-label={transportTitleText}>
                   {typedTransportTitle}
@@ -670,16 +706,20 @@ function Index() {
       <section id="concept" className="scroll-mt-20 bg-surface">
         <div className="relative w-full">
           <img
-                src="/7.jpg"
+            src="/7.jpg"
             alt="Open LNF networking booth concept"
             className="h-[42vh] min-h-[340px] w-full object-cover"
           />
+          <ImageWaveOverlay />
           <div className="absolute bottom-6 right-6 border-l-4 border-highlight bg-ink/85 px-5 py-4 text-sm font-black uppercase tracking-[0.08em] text-surface">
             People connect markets
           </div>
         </div>
         <div className="page-shell py-14">
-          <SectionHeading intro="The LNF shared booth brings together people, partner networks and business opportunities.">
+          <SectionHeading
+            className="wave-linked-title"
+            intro="The LNF shared booth brings together people, partner networks and business opportunities."
+          >
             More than booth space:
             <br />
             <span className="text-sky">a true networking happening</span>
