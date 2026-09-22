@@ -7,7 +7,9 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
-const applicationApiOrigin = "https://apitest.lnfederation.com";
+const applicationApiOrigin = (
+  process.env.API_TARGET ?? process.env.VITE_API_TARGET ?? "https://apipay.wsa-elite.com"
+).replace(/\/+$/, "");
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
