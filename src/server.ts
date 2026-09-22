@@ -8,7 +8,7 @@ type ServerEntry = {
 };
 
 const applicationApiOrigin = (
-  process.env.API_TARGET ?? process.env.VITE_API_TARGET ?? "https://apipay.wsa-elite.com"
+  process.env.API_TARGET ?? process.env.VITE_API_TARGET ?? "https://apitest.lnfederation.com"
 ).replace(/\/+$/, "");
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
@@ -61,6 +61,7 @@ export default {
               method: upstreamRequest.method,
               headers: upstreamRequest.headers,
               body: upstreamRequest.body,
+              duplex: "half",
               redirect: "follow",
             }),
           );
