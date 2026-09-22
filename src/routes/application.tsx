@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/application")({
   component: Application,
@@ -130,7 +129,7 @@ function Application() {
             <Label htmlFor="phone">Phone</Label>
             <Input id="phone" name="phone" type="tel" className="mt-2 h-11" />
           </div>
-         
+
           <div>
             <Label htmlFor="package">Package *</Label>
             <select id="package" name="package" className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">
