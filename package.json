@@ -8,7 +8,7 @@
     "build": "vite build && cp -r .output/public ./dist",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "start": "PORT=3016 HOST=0.0.0.0 node .output/server/index.mjs",
+    "start": "node -e \"process.env.PORT='3016'; process.env.HOST='0.0.0.0'; import('./.output/server/index.mjs')\"",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
