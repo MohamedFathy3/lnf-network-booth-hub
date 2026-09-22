@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
+import axios from "axios";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,10 +30,9 @@ function Application() {
     const form = new FormData(event.currentTarget);
     const password = String(form.get("password") ?? "");
     try {
-      const response = await fetch(applicationApiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      await axios.post(
+        applicationApiUrl,
+        {
           name: String(form.get("name") ?? "").trim(),
           address_line1: String(form.get("address_line1") ?? "").trim(),
           city: String(form.get("city") ?? "").trim(),
@@ -42,28 +42,21 @@ function Application() {
           password,
           unhashed_password: password,
           package: String(form.get("package") ?? "").trim(),
-          sponsorship: sponsorship.join(", "),
-        }),
-      });
-
-      if (!response.ok) {
-        const responseText = await response.text();
-        let errorMessage = responseText.trim();
-
-        try {
-          const errorBody = JSON.parse(responseText) as { message?: string; error?: string; detail?: string };
-          errorMessage = errorBody.message ?? errorBody.error ?? errorBody.detail ?? errorMessage;
-        } catch {
-          // Keep the raw response when the API does not return JSON.
-        }
-
-        const detail = errorMessage || `${response.status} ${response.statusText}`;
-        setError(detail);
-        toast.error("Application failed", { description: detail });
-        return;
-      }
+          sponsorship,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     } catch (requestError) {
-      const detail = requestError instanceof Error ? requestError.message : "Network request failed";
+      const responseData = axios.isAxiosError(requestError) ? requestError.response?.data : null;
+      const detail =
+        (typeof responseData === "object" && responseData !== null
+          ? responseData.message ?? responseData.error ?? responseData.detail
+          : typeof responseData === "string"
+            ? responseData
+            : null) ||
+        (requestError instanceof Error ? requestError.message : "Network request failed");
       setError(detail);
       toast.error("Application failed", { description: detail });
       return;
