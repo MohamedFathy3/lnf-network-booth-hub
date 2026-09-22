@@ -11,6 +11,30 @@ const applicationApiOrigin = (
   process.env.API_TARGET ?? process.env.VITE_API_TARGET ?? "https://apitest.lnfederation.com"
 ).replace(/\/+$/, "");
 
+// Hop-by-hop / connection-level headers that must never be forwarded manually.
+// Node's undici fetch throws InvalidArgumentError if these are present.
+const UNSAFE_PROXY_HEADERS = new Set([
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailer",
+  "transfer-encoding",
+  "upgrade",
+  "host",
+  "content-length",
+]);
+
+function buildUpstreamHeaders(sourceHeaders: Headers): Headers {
+  const headers = new Headers();
+  for (const [key, value] of sourceHeaders.entries()) {
+    if (UNSAFE_PROXY_HEADERS.has(key.toLowerCase())) continue;
+    headers.set(key, value);
+  }
+  return headers;
+}
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -56,12 +80,15 @@ export default {
         const upstreamUrl = `${applicationApiOrigin}${requestUrl.pathname}${requestUrl.search}`;
         try {
           const upstreamRequest = request.clone();
+          const upstreamHeaders = buildUpstreamHeaders(upstreamRequest.headers);
+          const hasBody = upstreamRequest.method !== "GET" && upstreamRequest.method !== "HEAD";
+
           return await fetch(
             new Request(upstreamUrl, {
               method: upstreamRequest.method,
-              headers: upstreamRequest.headers,
-              body: upstreamRequest.body,
-              duplex: "half",
+              headers: upstreamHeaders,
+              body: hasBody ? upstreamRequest.body : undefined,
+              duplex: hasBody ? "half" : undefined,
               redirect: "follow",
             }),
           );
