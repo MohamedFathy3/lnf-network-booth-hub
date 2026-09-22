@@ -26,7 +26,8 @@ function Application() {
     setSubmitting(true);
     setError("");
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const password = String(form.get("password") ?? "");
     try {
       await axios.post(
@@ -63,7 +64,7 @@ function Application() {
     }
 
     // Clear all filled inputs (native fields + controlled checkbox state)
-    event.currentTarget.reset();
+    formElement.reset();
     setSponsorship([]);
     setSubmitted(true);
 
@@ -85,8 +86,8 @@ function Application() {
               <Check className="size-6" />
             </span>
             <div>
-              <p className="text-base font-black text-ink">تم بعت application بنجاح يامعلم تمام</p>
-              <p className="text-sm text-ink/60">هنتواصل معاك قريبًا.</p>
+              <p className="text-base font-black text-ink">Application submitted successfully</p>
+              <p className="text-sm text-ink/60">Thank you for completing your application.</p>
             </div>
           </div>
         </div>
