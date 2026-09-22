@@ -11,9 +11,10 @@ const applicationApiOrigin = (
   process.env.API_TARGET ?? process.env.VITE_API_TARGET ?? "https://apitest.lnfederation.com"
 ).replace(/\/+$/, "");
 
-// Hop-by-hop / connection-level headers that must never be forwarded manually.
-// Node's undici fetch throws InvalidArgumentError if these are present.
-const UNSAFE_PROXY_HEADERS = new Set([
+// Hop-by-hop / connection-level headers that must never be forwarded manually
+// on the OUTGOING request to the upstream API. Node's undici fetch throws
+// InvalidArgumentError if these are present.
+const UNSAFE_REQUEST_HEADERS = new Set([
   "connection",
   "keep-alive",
   "proxy-authenticate",
@@ -26,10 +27,26 @@ const UNSAFE_PROXY_HEADERS = new Set([
   "content-length",
 ]);
 
-function buildUpstreamHeaders(sourceHeaders: Headers): Headers {
+// Headers that must be stripped from the upstream RESPONSE before relaying it
+// back to the browser. undici transparently decompresses the response body,
+// so forwarding the original Content-Encoding/Content-Length causes the
+// browser to attempt decoding an already-decoded body and fail with
+// ERR_CONTENT_DECODING_FAILED.
+const UNSAFE_RESPONSE_HEADERS = new Set(["content-encoding", "content-length", "transfer-encoding"]);
+
+function buildUpstreamRequestHeaders(sourceHeaders: Headers): Headers {
   const headers = new Headers();
   for (const [key, value] of sourceHeaders.entries()) {
-    if (UNSAFE_PROXY_HEADERS.has(key.toLowerCase())) continue;
+    if (UNSAFE_REQUEST_HEADERS.has(key.toLowerCase())) continue;
+    headers.set(key, value);
+  }
+  return headers;
+}
+
+function buildClientResponseHeaders(sourceHeaders: Headers): Headers {
+  const headers = new Headers();
+  for (const [key, value] of sourceHeaders.entries()) {
+    if (UNSAFE_RESPONSE_HEADERS.has(key.toLowerCase())) continue;
     headers.set(key, value);
   }
   return headers;
@@ -80,18 +97,26 @@ export default {
         const upstreamUrl = `${applicationApiOrigin}${requestUrl.pathname}${requestUrl.search}`;
         try {
           const upstreamRequest = request.clone();
-          const upstreamHeaders = buildUpstreamHeaders(upstreamRequest.headers);
+          const upstreamRequestHeaders = buildUpstreamRequestHeaders(upstreamRequest.headers);
           const hasBody = upstreamRequest.method !== "GET" && upstreamRequest.method !== "HEAD";
 
-          return await fetch(
+          const upstreamResponse = await fetch(
             new Request(upstreamUrl, {
               method: upstreamRequest.method,
-              headers: upstreamHeaders,
+              headers: upstreamRequestHeaders,
               body: hasBody ? upstreamRequest.body : undefined,
               duplex: hasBody ? "half" : undefined,
               redirect: "follow",
             }),
           );
+
+          const clientResponseHeaders = buildClientResponseHeaders(upstreamResponse.headers);
+
+          return new Response(upstreamResponse.body, {
+            status: upstreamResponse.status,
+            statusText: upstreamResponse.statusText,
+            headers: clientResponseHeaders,
+          });
         } catch (error) {
           console.error("Application API proxy failed", error);
           return Response.json(
