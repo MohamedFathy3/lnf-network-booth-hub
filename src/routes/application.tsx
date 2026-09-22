@@ -97,7 +97,7 @@ function Application() {
         <div className="page-shell flex h-32 items-center justify-between gap-4">
           <a href="/" className="flex min-w-0 flex-1 items-center gap-5" aria-label="LNF home">
             <img
-              src="/Logo%20(3).png"
+              src="/WSA.png"
               alt="Logistics Network Federation"
               className="h-20 w-auto max-w-[min(78vw,560px)] object-contain object-left md:h-32"
             />

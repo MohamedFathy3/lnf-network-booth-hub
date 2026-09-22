@@ -48,10 +48,10 @@ export const Route = createFileRoute("/")({
         content: "Seven networks. One booth. Countless connections in Munich, 26–29 April 2027.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/Logo%20(3).png" },
+      { property: "og:image", content: "/WSA.png" },
       { property: "og:image:alt", content: "LNF Logistics Network Federation logo" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/Logo%20(3).png" },
+      { name: "twitter:image", content: "/WSA.png" },
       { name: "twitter:image:alt", content: "LNF Logistics Network Federation logo" },
     ],
   }),
@@ -235,7 +235,9 @@ const sponsors = [
   },
 ];
 
-function Brand({ showTagline = false }: { showTagline?: boolean }) {
+function Brand({ showTagline = false, size = "default" }: { showTagline?: boolean; size?: "default" | "footer" }) {
+  const isFooter = size === "footer";
+
   return (
     <a
       href="#overview"
@@ -243,9 +245,10 @@ function Brand({ showTagline = false }: { showTagline?: boolean }) {
       aria-label="LNF home"
     >
       <img
-        src="/Logo%20(3).png"
-        alt="Logistics Network Federation"
-        className="h-20 w-auto max-w-[min(78vw,560px)] object-contain object-left md:h-32"
+        src="/WSA.png"
+        alt="WSA"
+        className={isFooter ? "w-auto max-w-[min(75vw,440px)] object-contain object-left" : "h-32 w-auto max-w-[min(88vw,760px)] object-contain object-left md:h-48"}
+        style={isFooter ? { height: "8rem" } : undefined}
       />
       {showTagline ? (
         <span className="ml-auto hidden text-right text-[0.65rem] font-black uppercase leading-[1.35] tracking-[0.16em] text-sky sm:block">
@@ -567,28 +570,7 @@ function Index() {
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-ink/65">
-              Participating networks
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-              {networkLogos.map(({ src, alt, href }) => (
-                <a
-                  key={src}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`Visit ${alt}`}
-                  className="group flex min-h-24 items-center justify-center border-r border-line px-3 py-3 transition-opacity duration-200 hover:opacity-90"
-                >
-                  <img
-                    src={src}
-                    alt={alt}
-                    loading="lazy"
-                    className="max-h-16 w-full object-contain transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  />
-                </a>
-              ))}
-            </div>
+           
             <div className="mt-7 flex flex-wrap items-end justify-between gap-3 text-xs font-bold text-ink/65">
               <span>
                 Exhibition Offer&nbsp; | &nbsp;transport logistic 2027&nbsp; | &nbsp;Munich
@@ -907,7 +889,7 @@ function Index() {
 
       <footer className="site-footer border-t border-line/70 bg-white text-ink">
         <div className="page-shell grid gap-8 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:items-center">
-          <Brand />
+          <Brand size="footer"  showTagline />
           <div className="text-sm leading-relaxed text-ink/65">
             <p>26–29 April 2027 | Messe München</p>
             <p className="mt-1">Exhibition Offer | transport logistic 2027 | Munich</p>
@@ -920,7 +902,7 @@ function Index() {
             </strong>
             <p className="flex items-center gap-1.5 text-sm font-bold text-ink/75 md:justify-end">
               <span>
-                <ScrollTypewriter text="Made by LNF with love" />
+                <ScrollTypewriter text="Made by WSA with love" />
               </span>
               <Heart className="heart-beat size-4 shrink-0 fill-highlight text-highlight" aria-hidden="true" />
             </p>
