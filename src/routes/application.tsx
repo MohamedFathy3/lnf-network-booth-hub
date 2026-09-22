@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import axios from "axios";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +19,7 @@ function Application() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [sponsorship, setSponsorship] = useState<string[]>([]);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   const submitApplication = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -57,23 +57,41 @@ function Application() {
             : null) ||
         (requestError instanceof Error ? requestError.message : "Network request failed");
       setError(detail);
-      toast.error("Application failed", { description: detail });
       return;
     } finally {
       setSubmitting(false);
     }
 
-    setSubmitted(true);
-    setSponsorship([]);
+    // Clear all filled inputs (native fields + controlled checkbox state)
     event.currentTarget.reset();
-    toast.success("Application submitted successfully", {
-      description: "Thank you. We will contact you shortly.",
-    });
-    window.setTimeout(() => navigate({ to: "/" }), 1400);
+    setSponsorship([]);
+    setSubmitted(true);
+
+    // Show centered success toast, then redirect
+    setShowSuccessToast(true);
+    window.setTimeout(() => setShowSuccessToast(false), 2400);
+    window.setTimeout(() => navigate({ to: "/" }), 1800);
   };
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      {showSuccessToast ? (
+        <div
+          role="status"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 animate-in fade-in"
+        >
+          <div className="flex items-center gap-3 rounded-xl bg-surface px-6 py-5 shadow-2xl">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-success/15 text-success">
+              <Check className="size-6" />
+            </span>
+            <div>
+              <p className="text-base font-black text-ink">تم بعت application بنجاح يامعلم تمام</p>
+              <p className="text-sm text-ink/60">هنتواصل معاك قريبًا.</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <header className="border-b border-line bg-surface">
         <div className="page-shell flex h-32 items-center justify-between gap-4">
           <a href="/" className="flex min-w-0 flex-1 items-center gap-5" aria-label="LNF home">
