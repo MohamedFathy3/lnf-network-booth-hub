@@ -186,10 +186,10 @@ const packages = [
 
 const sponsors = [
   {
-    title: "Beer Sponsor",
+    title: "Beer Sponsorship",
     price: "2,000 EUR",
     image: "sposlnf/Beer.jpg",
-    brand: "SOLID AUTO",
+    soldOut: true,
     icon: Beer,
     bulletIcons: [CupSoda, Users, Heart],
     bullets: [
@@ -761,10 +761,10 @@ function Index() {
             <strong className="text-4xl font-black md:text-5xl">Sponsorship &amp; Additional Options</strong>
           </SectionHeading>
           <div className="grid gap-5 lg:grid-cols-2">
-            {sponsors.map(({ title, price, image, brand, icon: Icon, bulletIcons, bullets }) => (
+            {sponsors.map(({ title, price, image, soldOut, icon: Icon, bulletIcons, bullets }) => (
               <article
                 key={title}
-                className={`package-card group flex flex-col transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${brand ? "border-2 border-red-600 shadow-[0_12px_35px_rgba(185,28,28,0.2)]" : ""}`}
+                className={`package-card group relative flex flex-col transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${soldOut ? "border-2 border-red-600 shadow-[0_12px_35px_rgba(185,28,28,0.2)]" : ""}`}
               >
                 <div className="relative overflow-hidden">
                   <img
@@ -772,10 +772,17 @@ function Index() {
                     alt={title}
                     className="h-75 w-full rounded-t-[6px] object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
-                  {brand ? (
-                    <div className="absolute bottom-5 left-5 border-y-4 border-white bg-red-600 px-5 py-2 text-2xl font-black tracking-[0.18em] text-white shadow-lg md:text-3xl">
-                      {brand}
-                    </div>
+                  {soldOut ? (
+                    <img
+                      src="/sold-out-stamp-design-template-89756519e732cfb0be2a52799ef0d5d4_screen-removebg-preview.png"
+                      alt="Sold Out"
+                      className="absolute right-4 top-4 z-10 w-32 rotate-[-10deg] object-contain drop-shadow-xl md:w-40"
+                    />
+                  ) : null}
+                  {soldOut ? (
+                    <span className="absolute left-[-2.75rem] top-7 z-10 w-44 -rotate-[40deg] bg-red-600 px-3 py-2 text-center text-[0.65rem] font-black uppercase tracking-[0.16em] text-white shadow-lg md:left-[-3.25rem] md:top-9 md:w-52 md:text-xs">
+                      SOLD OUT
+                    </span>
                   ) : null}
                 </div>
                 <div className="flex flex-1 flex-col p-6">
@@ -799,14 +806,20 @@ function Index() {
                       );
                     })}
                   </ul>
-                  <Button
-                    asChild
-                    className="mt-7 w-full bg-highlight font-black text-highlight-foreground hover:bg-highlight/90"
-                  >
-                    <a href="/application">
-                      Join Us <ArrowRight />
-                    </a>
-                  </Button>
+                  {soldOut ? (
+                    <div className="mt-7 w-full border-t border-red-200 pt-4 text-center text-sm font-black tracking-[0.24em] text-red-600">
+                      SOLD OUT
+                    </div>
+                  ) : (
+                    <Button
+                      asChild
+                      className="mt-7 w-full bg-highlight font-black text-highlight-foreground hover:bg-highlight/90"
+                    >
+                      <a href="/application">
+                        Join Us <ArrowRight />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </article>
             ))}
