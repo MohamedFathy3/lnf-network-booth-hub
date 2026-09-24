@@ -166,9 +166,17 @@ function Application() {
                 "Coffee Sponsor",
                 "Bavarian Evening Sponsor",
               ].map((option) => (
-                <label key={option} className="flex cursor-pointer items-center gap-2 rounded-md border border-line p-3 text-sm font-bold">
+                <label
+                  key={option}
+                  className={`flex items-center gap-2 rounded-md border p-3 text-sm font-bold ${
+                    option === "Beer Sponsor"
+                      ? "cursor-not-allowed border-red-600 text-red-600 opacity-80"
+                      : "cursor-pointer border-line"
+                  }`}
+                >
                   <input
                     type="checkbox"
+                    disabled={option === "Beer Sponsor"}
                     checked={sponsorship.includes(option)}
                     onChange={(event) =>
                       setSponsorship((current) =>
