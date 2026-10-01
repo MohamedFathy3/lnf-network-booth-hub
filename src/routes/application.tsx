@@ -151,10 +151,12 @@ function Application() {
 
           <div>
             <Label htmlFor="package">Package *</Label>
-            <select id="package" name="package" className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">
-              <option value="Gold">Gold</option>
-              <option value="Premium">Premium</option>
-              <option value="Silver">Silver</option>
+            <select id="package" name="package" required className="mt-2 h-11 w-full rounded-md border border-input bg-surface px-3 text-sm">
+              <option value="" disabled>Select a package</option>
+              <option value="Category 1 | Premium Counter">Category 1 | Premium Counter</option>
+              <option value="Category 2 | Shared High Table 2/3">Category 2 | Shared High Table 2/3</option>
+              <option value="Category 3 | Shared High Table 1/3">Category 3 | Shared High Table 1/3</option>
+              <option value="Wall of Fame">Wall of Fame</option>
             </select>
           </div>
           <div className="md:col-span-2">
